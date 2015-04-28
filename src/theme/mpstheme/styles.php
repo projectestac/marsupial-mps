@@ -1,6 +1,6 @@
 <?PHP /*  $Id: styles.php,v 1.65 2006/04/07 15:07:54 moodler Exp $ */
 
-/// Every theme should contain a copy of this script.  It lets us 
+/// Every theme should contain a copy of this script.  It lets us
 /// set up variables and so on before we include the raw CSS files.
 /// The output of this script should be a completely standard CSS file.
 
@@ -15,5 +15,4 @@
     $lang        = optional_param('lang', '', PARAM_FILE);          // Look for styles in this language
 
     style_sheet_setup(time(), $lifetime, $themename, $forceconfig, $lang);
-   
-?>
+

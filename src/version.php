@@ -11,5 +11,3 @@
                               //          Y.YY = micro-increments between releases
 
     $release = '1.0.5 (Build: 20110330)';     // Human-friendly version name
-
-?>

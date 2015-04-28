@@ -1,10 +1,10 @@
 <?php
 // IECISA -> MPS ********** ADDED -> create new web service
-  
+
 	/// load libraries
 	require_once('../../../config.php');
-	require_once($CFG->dirroot.'/ws/lib.php'); 
-	
+	require_once($CFG->dirroot.'/ws/lib.php');
+
 	if (!isset($_GET['wsdl'])){
 		//save log registering the call to the ws server
 	    add_to_log(2,1);
@@ -13,19 +13,19 @@
 	        add_to_log(2,'2-1',serialize($HTTP_RAW_POST_DATA),true);
 	    }
 	}
-	
+
 	function generate_wsdl()
 	{
 	    global $CFG;
-	    
+
 	    if(!is_file("$CFG->dataroot/1/WebServices/wsBooksStructure/wsBooksStructure.wsdl"))
 	    {
 	    	//save log registering the wsdl generation
 	    	if ($CFG->debugmode && !isset($_GET['wsdl'])){
 	            add_to_log(2,'2-2','',true);
 	    	}
-	        
-			$strwsdl='<?xml version="1.0" encoding="UTF-8"?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI"s version is JAX-WS RI 2.1.7-b01-. --><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://educacio.gencat.cat/agora/estructuralibros/" targetNamespace="http://educacio.gencat.cat/agora/estructuralibros/"> 
+
+			$strwsdl='<?xml version="1.0" encoding="UTF-8"?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI"s version is JAX-WS RI 2.1.7-b01-. --><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://educacio.gencat.cat/agora/estructuralibros/" targetNamespace="http://educacio.gencat.cat/agora/estructuralibros/">
 			  <wsdl:types>
 			    <xs:schema elementFormDefault="qualified" targetNamespace="http://educacio.gencat.cat/agora/estructuralibros/">
 			      <xs:complexType name="Actividad">
@@ -224,7 +224,7 @@
 			    </wsdl:port>
 			  </wsdl:service>
 			</wsdl:definitions>';
-		
+
 		    if(!is_dir("$CFG->dataroot/1"))
 		    {
 		        mkdir("$CFG->dataroot/1");
@@ -242,23 +242,23 @@
 		    fclose($f);
 		}
 	}
-	
-	
+
+
 	class ObtenerEstructuraResponse
 	{
 	    public $ObtenerEstructuraResult;
 	}
-	
+
 	class ObtenerTodosResponse
 	{
 	    public $ObtenerTodosResult;
 	}
-	
+
 	class Catalogo
 	{
 	    public $libros;
 	}
-	
+
 	/*class libros
 	{
 	    public $libros;
@@ -272,7 +272,7 @@
 	    public $formato;
 	    public $unidades;
 	}
-	
+
 	/*class unidades
 	{
 	    public $unidad;
@@ -285,7 +285,7 @@
 	    public $orden;
 	    public $actividades;
 	}
-	
+
 	/*
 	class actividades
 	{
@@ -298,14 +298,14 @@
 	    public $titulo;
 	    public $orden;
 	}
-	
-	
+
+
 	function RetornaLibros($books_recordset)
 	{
 	    global $CFG;
-	    
+
 	    $books = $books_recordset;
-	
+
 	    $arrLibros = array();
 	    foreach($books as $b)
 	    {
@@ -315,7 +315,7 @@
 	        $libro_encontrado->nivel = $b['level'];
 	        $libro_encontrado->formato = $b['format'];
 	        array_push($arrLibros, $libro_encontrado);
-	        
+
 //XTEC ************* DELETED -> Take out becouse we just want to send book info, not the structure of each book
 // 2011.03.30 @mmartinez
 	        /*$arrUnidades = array();
@@ -328,11 +328,11 @@
 	                $unidad_encontrada->titulo = $u['name'];
 	                $unidad_encontrada->orden = $u['sortorder'];
 	                array_push($arrUnidades, $unidad_encontrada);
-	
+
 	                $arrActividades = array();
 	                if ($activ = get_recordset_sql("select * from {$CFG->prefix}books_activities where bookid = '{$b['id']}' and unitid = '{$u['id']}'"))
 	                {
-	
+
 	                    foreach($activ as $a)
 	                    {
 	                        $actividad_encontrada = new actividad();
@@ -351,8 +351,8 @@
 //************ END
 
 	    }
-	
-	    return $arrLibros;    
+
+	    return $arrLibros;
 	}
 
 //XTEC ************* ADDED -> Full response when the method called is get book sctructure
@@ -360,9 +360,9 @@
 	function RetornaEstructuraLibros($books_recordset)
 	{
 	    global $CFG;
-	    
+
 	    $books = $books_recordset;
-	
+
 	    $arrLibros = array();
 	    foreach($books as $b)
 	    {
@@ -372,7 +372,7 @@
 	        $libro_encontrado->nivel = $b['level'];
 	        $libro_encontrado->formato = $b['format'];
 	        array_push($arrLibros, $libro_encontrado);
-	        
+
 	        $arrUnidades = array();
 	        if ($units = get_recordset_sql("select * from {$CFG->prefix}books_units where bookid = '{$b['id']}'"))
 	        {
@@ -383,11 +383,11 @@
 	                $unidad_encontrada->titulo = $u['name'];
 	                $unidad_encontrada->orden = $u['sortorder'];
 	                array_push($arrUnidades, $unidad_encontrada);
-	
+
 	                $arrActividades = array();
 	                if ($activ = get_recordset_sql("select * from {$CFG->prefix}books_activities where bookid = '{$b['id']}' and unitid = '{$u['id']}'"))
 	                {
-	
+
 	                    foreach($activ as $a)
 	                    {
 	                        $actividad_encontrada = new actividad();
@@ -405,23 +405,23 @@
 	            $libro_encontrado->unidades = $arrUnidades;
 
 	    }
-	
-	    return $arrLibros;    
+
+	    return $arrLibros;
 	}
 //************ END
-	
+
 	function ObtenerTodos($param)
 	{
 	    global $CFG;
-	    
+
 	    /// save log registering request parameters
 	    $data_to_log->idcentro = $param->IdCentro;
 	    add_to_log(2,12,serialize($data_to_log));
-	    
+
 	    $ret = new ObtenerTodosResponse();
-	    
+
 	    $auth = UserAuthentication($GLOBALS["HTTP_RAW_POST_DATA"]);
-	    
+
 	    if ($auth->Codigo == '1')
 	    {
 	        //return all books
@@ -429,7 +429,7 @@
 	        	if ($books = get_records('center_books', 'centerid', $center->id)){
 	        		$where = '';
 	        		foreach ($books as $book){
-	        		    $where .= $book->bookid.',';	        			
+	        		    $where .= $book->bookid.',';
 	        		}
 	        		$where = substr($where, 0, strlen($where)-1);
 	        	    $sSql = "SELECT * FROM {$CFG->prefix}books WHERE id IN ({$where})";
@@ -439,54 +439,54 @@
 	        } else {
 	            $sSql = "SELECT * FROM {$CFG->prefix}books";
 	        }
-	
+
 	        $books = get_recordset_sql($sSql);
-	
+
 	        $arrLibros = array();
 	        $arrLibros = RetornaLibros($books);
-	
+
 	        $ret->ObtenerTodosResult->Codigo = "1";
 	        $ret->ObtenerTodosResult->Descripcion ="procés correcte";
 	        $ret->ObtenerTodosResult->Catalogo = new Catalogo();
-	
+
 	        $ret->ObtenerTodosResult->Catalogo->libros = $arrLibros;
 	    }
 	    else
 	    {
 	        $ret->ObtenerTodosResult->Codigo = $auth->Codigo;
-	        $ret->ObtenerTodosResult->Descripcion = $auth->Descripcion;      
+	        $ret->ObtenerTodosResult->Descripcion = $auth->Descripcion;
 	    }
 
 	    /// save log registering method response
 	    add_to_log(2, 22, serialize($ret->ObtenerTodosResult));
-	    
+
 	    return $ret;
-	
+
 	}
-	
-	
+
+
 	function ObtenerEstructura($param)
 	{
 	    global $CFG;
-	    
+
 	    /// save log registering request parameters
 	    $data_to_log->ISBN = $param->ISBN;
 	    add_to_log(2,10,serialize($data_to_log));
-	
+
 	    $ret = new ObtenerEstructuraResponse();
-	    
+
 	    $auth = UserAuthentication($GLOBALS["HTTP_RAW_POST_DATA"]);
-	    
+
 	    if ($auth->Codigo == '1')
 	    {
 	        //default return
 	        $ret->ObtenerEstructuraResult->Codigo = "0";
-	        $ret->ObtenerEstructuraResult->Descripcion = "no s'ha trobat llibre";      
-	        
+	        $ret->ObtenerEstructuraResult->Descripcion = "no s'ha trobat llibre";
+
 	        if (isset($param))
 	        {
 	            $sSql = "Select * from {$CFG->prefix}books where isbn = '{$param->ISBN}'";
-	
+
 	            if ($books = get_recordset_sql($sSql))
 	            {
 	                $arrLibros = array();
@@ -494,7 +494,7 @@
 	                if (count($arrLibros) > 0)
 	                {
 	                    $ret->ObtenerEstructuraResult->Codigo = "1";
-	                    $ret->ObtenerEstructuraResult->Descripcion = "procés correcte";      
+	                    $ret->ObtenerEstructuraResult->Descripcion = "procés correcte";
 	                    $lib = new libro();
 	                    $lib = $arrLibros[0];
 	                    $ret->ObtenerEstructuraResult->Libros->libro = $lib;
@@ -505,73 +505,72 @@
 	    else
 	    {
 	        $ret->ObtenerEstructuraResult->Codigo = $auth->Codigo;
-	        $ret->ObtenerEstructuraResult->Descripcion = $auth->Descripcion;      
+	        $ret->ObtenerEstructuraResult->Descripcion = $auth->Descripcion;
 	    }
-	
+
 	    /// save log registering method response
 	    add_to_log(2, 20, serialize($ret->ObtenerEstructuraResult));
-	    
-	    return $ret;    
+
+	    return $ret;
 	}
-	
+
 	function UserAuthentication($post_data)
 	{
 	    global $CFG;
-	    
+
 	    $retAut->Codigo = '-101';
 	    $retAut->Descripcion = 'Usuari/contrasenya errònies';
-	    
+
 	    $post = rcommon_xml2array($post_data);
-	    
+
 	    if ($CFG->debugmode){
 	    	/// save log registering the xml received headers
 	        add_to_log(2,'2-10',serialize(rcommond_findarrayvalue($post, array("Envelope", "Header", "WSEAuthenticateHeader"))),true);
 	    }
-	
+
 	    $keys = array("Envelope", "Header", "WSEAuthenticateHeader", "User", "value");
 	    if ($valor = rcommond_findarrayvalue($post, $keys))
 	    {
 	        $keys = array("Envelope", "Header", "WSEAuthenticateHeader", "User", "value");
 	        $user_pub = rcommond_findarrayvalue($post, $keys);
-	
+
 	        $keys = array("Envelope", "Header", "WSEAuthenticateHeader", "Password", "value");
 	        $pwr_pub = rcommond_findarrayvalue($post, $keys);
-	        
+
 	        /// save log with request headers data
 		    $data_to_log->user = $user_pub;
 			$data_to_log->pwd = $pwr_pub;
 		    add_to_log(2,11,serialize($data_to_log));
-	        
+
 	        if ($creden_usr = get_record_sql("select * from {$CFG->prefix}lms_ws_credentials where username = '{$user_pub}' and password = '{$pwr_pub}'"))
 	        {
 	            $retAut->Codigo = $creden_usr->code;
 	            $retAut->Descripcion = $creden_usr->description;
 	        }
 	    }
-	    
+
 	    /// save log with headers auth return
         add_to_log(2,21,serialize($retAut));
-        
+
 	    return $retAut;
 	}
-	
+
 	generate_wsdl();
-	
+
 	ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
-	
+
 	global $CFG;
-	
-	$server = new SoapServer($CFG->dataroot.'/1/WebServices/wsBooksStructure/wsBooksStructure.wsdl', array('soap_version' => SOAP_1_1));       
-	
+
+	$server = new SoapServer($CFG->dataroot.'/1/WebServices/wsBooksStructure/wsBooksStructure.wsdl', array('soap_version' => SOAP_1_1));
+
 	$server->addFunction("ObtenerTodos");
 	$server->addFunction("ObtenerEstructura");
-	
+
 	$HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';
 
 	$server->handle();
-    
+
     if (!isset($_GET['wsdl'])){
 	    add_to_log(2,100);
     }
-    
-?>
+

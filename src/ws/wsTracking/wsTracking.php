@@ -3,7 +3,7 @@
 //print_r($_POST); die; //debug purpose
 
 require_once('../../../config.php');
-require_once($CFG->dirroot.'/ws/lib.php'); 
+require_once($CFG->dirroot.'/ws/lib.php');
 
 //*****  CLASSES
 
@@ -84,7 +84,7 @@ class ResultadoDetalleExtendido
   $detall = array('grade_1', 'grade_2', 'grade_3', 'grade_4');
   $questionsresults = array('key0b20', 'key1b20', 'key2b20', 'key3b20');
   $total_Calif = 0;
-  $token = required_param('token', PARAM_RAW); 
+  $token = required_param('token', PARAM_RAW);
 
   //save log registering the call to the ws server
   add_to_log(3,1);
@@ -107,15 +107,15 @@ class ResultadoDetalleExtendido
   //$log->totalgrade = optional_param('totalgrade', 0, PARAM_INT);
 // ********** FI
   add_to_log(3,10,serialize($log));
-  
+
   $paramresults = '';
-  
+
   //getting credential to call ws tracking
   if ($reg_credential = get_record("lms_ws_credentials", "success", "1"))
   {
       add_to_log(3,11,serialize($reg_credential));
 
-      //get data from the session  
+      //get data from the session
       if ($reg_session = get_record("sessions", 'token', $token))
       {
           $result = new SeguimientoExtendido();
@@ -148,7 +148,7 @@ class ResultadoDetalleExtendido
                $result->idUnidad = $_POST['gradeunit'];
            }
 // ********** FI
-          
+
           $result->idCentro = $reg_session->centerid;
           $result->idContenidoLMS = $reg_session->lmscontentid;
           $result->idUsuario = $reg_session->userid;
@@ -202,12 +202,12 @@ class ResultadoDetalleExtendido
 
               if ($paramresults != '')
                 $paramresults = $paramresults."&";
-                
+
               $paramresults = $paramresults.$rq;
-              
+
               array_push($result->Detalles, $det);
           }
-          
+
           $result->Resultado->URLVerResultados = $reg_session->urlcontent."&".$paramresults;
 
           /// save log registering the data result for LMS tracking
@@ -230,20 +230,20 @@ class ResultadoDetalleExtendido
           $log->URLVerResultados = $result->Resultado->URLVerResultados;
 
           add_to_log(3, 12, serialize(addslashes_object($log)));
-        
+
           /// save log registering the number of details
           add_to_log(3, 13, serialize(count($result->Detalles)));
           $params = new ResultadoDetalleExtendido();
-          $params->ResultadoExtendido = new SoapVar($result, SOAP_ENC_OBJECT, "SeguimientoExtendido", "http://educacio.gencat.cat/agora/seguimiento/");      
+          $params->ResultadoExtendido = new SoapVar($result, SOAP_ENC_OBJECT, "SeguimientoExtendido", "http://educacio.gencat.cat/agora/seguimiento/");
 
           $client = new soapclient($reg_session->wsurltracking.'?wsdl', array('trace' => 1));
 
           $auth = array('User' => $reg_credential->username, 'Password' => $reg_credential->password);
-            
+
           $namespace=rcommond_wdsl_parser($reg_session->wsurltracking.'?wsdl');
 
           $header = new SoapHeader($namespace, "WSEAuthenticateHeader", $auth);
-          $client->__setSoapHeaders(array($header)); 
+          $client->__setSoapHeaders(array($header));
 
           /// save log registering the call to ws tracking
             add_to_log(3, 14);
@@ -263,9 +263,9 @@ class ResultadoDetalleExtendido
           } else {
             $descError = "WS response error: ".$response->ResultadoDetalleExtendidoResult->DetalleError->Codigo." - ".$response->ResultadoDetalleExtendidoResult->DetalleError->Descripcion;  //have to add it to idiomatic files
             echo $descError;
-            add_to_log(3, '3-1',serialize($descError), true); // have to add a error id and put serialize($descError) 
+            add_to_log(3, '3-1',serialize($descError), true); // have to add a error id and put serialize($descError)
           }
-      } 
+      }
       else
       {
         echo get_string("withoutsession", "tracking");
@@ -278,6 +278,3 @@ class ResultadoDetalleExtendido
      add_to_log(3, '3-3', serialize("withoutcredentials"), true);
   }
 
-  
-  
-?>

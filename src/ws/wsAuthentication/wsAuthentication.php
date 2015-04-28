@@ -3,8 +3,8 @@
 
     /// load libraries
     require_once('../../../config.php');
-    require_once($CFG->dirroot.'/ws/lib.php'); 
-	
+    require_once($CFG->dirroot.'/ws/lib.php');
+
     if (!isset($_GET['wsdl'])){
     	//save log registering the call to the ws server
 	    add_to_log(1,1);
@@ -13,18 +13,18 @@
 	        add_to_log(1,'1-1',serialize($HTTP_RAW_POST_DATA),true);
 	    }
     }
-    
+
 	function generate_wsdl()
 	{
 		global $CFG;
-		
+
 		if(!is_file("{$CFG->dataroot}/1/WebServices/wsAuthentication/wsAuthentication.wsdl"))
 		{
 			//save log registering the wsdl generation
 			if ($CFG->debugmode && !isset($_GET['wsdl'])){
 			    add_to_log(1,'1-2','',true); //debug mode
 			}
-			
+
 			$strwsdl='<?xml version="1.0" encoding="UTF-8"?>
 			<definitions xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://educacio.gencat.cat/proveedores/autenticacion/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://educacio.gencat.cat/proveedores/autenticacion/">
 			<types>
@@ -155,7 +155,7 @@
 			fclose($f);
 		}
 	}
-    
+
 	class AutenticarUsuarioContenidoResponse
 	{
 		public $AutenticarUsuarioContenidoResult;
@@ -169,15 +169,15 @@
 	}
 
     /// define methods as a php function
-	function AutenticarUsuarioContenido($usrcontent) 
+	function AutenticarUsuarioContenido($usrcontent)
     {
     	global $CFG;
-    	
+
     	//save log registering the request data
 	    add_to_log(1,10,serialize($usrcontent));
 
         $result = new AutenticarUsuarioContenidoResponse();
-        
+
         $auth = UserAuthentication($GLOBALS["HTTP_RAW_POST_DATA"]);
 
         if ($auth->Codigo == '1')
@@ -190,7 +190,7 @@
                    $result->AutenticarUsuarioContenidoResult->Codigo = $book_credential->code;
                    $result->AutenticarUsuarioContenidoResult->Descripcion = $book_credential->description;
                    $result->AutenticarUsuarioContenidoResult->URL = $book_credential->url;
-                   
+
 //XTEC *********** AFEGIT -> Check if isset parameter Rol and if one off the tow allowed values
 //2011.05.16  @mmartinez
                    if (isset($usrcontent->Rol)){
@@ -205,11 +205,11 @@
                    	   $usrcontent->Rol = "ESTUDIANTE";
                    }
 //*********** FI
-                   
+
                    if ($book_credential->success == 1){
-                   
+
 	                   /// get the absolute book path
-	                   $path = $CFG->wwwroot.'/data/books/';                   
+	                   $path = $CFG->wwwroot.'/data/books/';
 	                   if ($usrcontent->IdUnidad == '' && $usrcontent->IdActividad == ''){
 	                   	   if (!$bookpath = get_record('books', 'isbn', $usrcontent->ISBN)){
 	                   	   	   //save log error becouse the ISBN it's not found in db
@@ -222,7 +222,7 @@
 		                   	   	   	   add_to_log (1, '1-201', serialize(array('ISBN' => $usrcontent->ISBN, 'path' => $bookpath->path)), true);
 		                   	   	   }
 	                   	       }
-	                           
+
 	                   	   	   /// set the absolute path to the manifest
 	                   	   	   $result->AutenticarUsuarioContenidoResult->URL = $path.$bookpath->path;
 	                   	   }
@@ -252,7 +252,7 @@
 		                   	   	   /// set the absolute path to the manifest
 		                   	   	   $result->AutenticarUsuarioContenidoResult->URL = $path.$unitpath->path;
 	                   	   	   }
-	                   	   }                   	
+	                   	   }
 	                   }
 	                   /// get the absolute activity path
 	                   else if ($usrcontent->IdUnidad != '' && $usrcontent->IdActividad != ''){
@@ -288,17 +288,17 @@
 	                   	   	   	   }
 	                   	   	   }
 	                   	   }
-	                   	
+
 	                   }
 	                   /// if no path is found send the generic one
-	                   else{ 
+	                   else{
 	                   	   add_to_log(1,'1-204',serialize(array('ISBN' => $book_credencial->ISBN)));
 	                       $result->AutenticarUsuarioContenidoResult->URL=$book_credential->url;
 	                   }
-	                   
+
 	//GAP
 	//********** AFEGIT XTEC - if URL generated correctly, generates the token and saves the data in the session table
-	
+
 	                   if ($result->AutenticarUsuarioContenidoResult->Codigo == 1)
 	                   {
 	                       if (isset($bookpath->format) and $bookpath->format == 'webcontent' and !isset($_GET['wsdl']))
@@ -318,17 +318,17 @@
 	                           $session->addtime = time();
 	                           $session->expiretime = time() + 86400;  //expire in 24 hours
 							   $session->urlcontent = $result->AutenticarUsuarioContenidoResult->URL."?token={$session->token}";
-	                           
+
 	                           $session = addslashes_object($session);
-	
+
 	                           $result->AutenticarUsuarioContenidoResult->URL = $result->AutenticarUsuarioContenidoResult->URL."?token={$session->token}";
-	                           
+
 	                           insert_record("sessions", $session);
 	                       }
 	                   }
                    }
 //**********
-                   
+
                }
                else{
                    $result->AutenticarUsuarioContenidoResult->Codigo = '-2';
@@ -345,27 +345,27 @@
         else
         {
             $result->AutenticarUsuarioContenidoResult->Codigo = $auth->Codigo;
-            $result->AutenticarUsuarioContenidoResult->Descripcion = $auth->Descripcion;      
+            $result->AutenticarUsuarioContenidoResult->Descripcion = $auth->Descripcion;
             $result->AutenticarUsuarioContenidoResult->URL = $auth->url;
-			
+
         }
         /// save log registering method response
         add_to_log(1,20,serialize($result->AutenticarUsuarioContenidoResult));
-        
+
         return $result;
     }
-    
-    
+
+
 
     function UserAuthentication($post_data)
     {
         global $CFG;
-		
+
         $retAut->Codigo = '-101';
         $retAut->Descripcion = 'Usuari/contrasenya errònies';
-        
+
         $post = rcommon_xml2array($post_data);
-        
+
     	if ($CFG->debugmode){
 	    	/// save log registering the xml received headers
 	        add_to_log(1,'1-11',serialize(rcommond_findarrayvalue($post, array("Envelope", "Header", "WSEAuthenticateHeader"))),true);
@@ -379,22 +379,22 @@
 
             $keys = array("Envelope", "Header", "WSEAuthenticateHeader", "Password", "value");
             $pwr_pub = rcommond_findarrayvalue($post, $keys);
-        
+
             /// save log with request headers data
 		    $data_to_log->user = $user_pub;
 			$data_to_log->pwd = $pwr_pub;
 		    add_to_log(1,11,serialize($data_to_log));
-            
+
             if ($creden_usr = get_record_sql("select * from {$CFG->prefix}lms_ws_credentials where username = '{$user_pub}' and password = '{$pwr_pub}'"))
             {
                 $retAut->Codigo = $creden_usr->code;
                 $retAut->Descripcion = $creden_usr->description;
             }
         }
-        
+
         /// save log with headers auth return
 		add_to_log(1,21,serialize($retAut));
-        
+
         return $retAut;
     }
 
@@ -404,46 +404,46 @@
 
     global $CFG;
 
-    $server = new SoapServer("{$CFG->dataroot}/1/WebServices/wsAuthentication/wsAuthentication.wsdl", array('soap_version' => SOAP_1_1));       
+    $server = new SoapServer("{$CFG->dataroot}/1/WebServices/wsAuthentication/wsAuthentication.wsdl", array('soap_version' => SOAP_1_1));
 
     $server->addFunction("AutenticarUsuarioContenido");
 
     $HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';
 
     $resp = $server->handle();
-    
+
     if (!isset($_GET['wsdl'])){
 	    add_to_log(1,100);
 	    die;
     }
-    
+
     /*
      * function that set to absolute all the href
-     * 
+     *
      *@param   string  $path -> relative path to the manifest.xml
      *@return  bool    action finish ok or ko
-     */ 
+     */
     function manifest_manipulation ($path){
-    	
+
     	global $CFG;
-    	
+
     	$dirpath = $CFG->dirroot.'/data/books/'.$path;
     	$path = $CFG->wwwroot.'/data/books/'.$path;
-    	
+
         $topath = '';
 	    $separator = '/';
 	    $frompath = split($separator,$path);
 	    for ($i=0; $i<(count($frompath)-1); $i++){
-	    	$topath .= $frompath[$i].$separator;    		
+	    	$topath .= $frompath[$i].$separator;
 	    }
-    	
-	    if ($handle = fopen($dirpath, "r")){	    	
-    	
+
+	    if ($handle = fopen($dirpath, "r")){
+
 	        $buffer = '';
 	        while(!feof($handle)){
 	        	$buffer .= fgets($handle, 4096);
 	        }
-	        
+
 	        $buffer = split('href="', $buffer);
 	        $return = $buffer[0];
 	        for ($i=1; $i<count($buffer); $i++){
@@ -459,13 +459,13 @@
 	        	/// set actuall row to return parameter
 	        	$return .= 'href="'.$relurl.substr($buffer[$i],$stpos,strlen($buffer[$i]));
 	        }
-	        
+
 	        fclose($handle);
-	        
+
 	        $handle = fopen($dirpath, "w+");
 	        fwrite($handle,$return);
 	        fclose($handle);
-	        
+
 	        return true;
 	    }else{
 	    	add_to_log(1, '1-202', serialize($path), true);
@@ -473,6 +473,5 @@
 	    add_to_log(1, '1-203', serialize($path), true);
 	    return false;
     }
-	
+
 // ************ END
-?>

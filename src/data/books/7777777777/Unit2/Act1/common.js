@@ -25,7 +25,7 @@
 var objBrowse = navigator.appName;
 
 // An array of js strings to evaluate on document load
-var onLoadHandlers = [clearHidden, window.parent.enableButtons];
+var onLoadHandlers = [clearHidden];
 var beforeSubmitHandlers = new Array();
 
 // Called on document load
@@ -34,7 +34,7 @@ function onLoadHandler() {
 }
 
 curr_edits_math_num = 1
-// for unique mimetex images from exemath. will reset to #1 w/ each new edit, 
+// for unique mimetex images from exemath. will reset to #1 w/ each new edit,
 // but will create  unique math# within each edit session to the previews dir.
 
 // Strings to be translated
@@ -63,7 +63,7 @@ YOUR_SCORE_IS      = "Your score is ";
 // [func, arg]
 function runFuncArray(handlers) {
     for (var i=0; i < handlers.length; i++) {
-        var row = handlers[i] 
+        var row = handlers[i]
         if (typeof row=="function")
             row()
         else {
@@ -150,7 +150,7 @@ function addImage(elementId) {
             theForm = document.getElementById('contentForm')
         }
         theForm.action.value = "addImage"
-        theForm.object.value = elementId 
+        theForm.object.value = elementId
         theForm.submit()
     }
 }
@@ -170,7 +170,7 @@ function addFeedbackImage(elementId) {
             theForm = document.getElementById('contentForm')
         }
         theForm.action.value = "addImage"
-        theForm.object.value = elementId 
+        theForm.object.value = elementId
         var width = document.getElementById('width'+elementId);
         var height = document.getElementById('height'+elementId);
         width.value = "100"
@@ -178,7 +178,7 @@ function addFeedbackImage(elementId) {
         theForm.submit()
         changeImageWidth(elementId)
         theForm.submit()
-        
+
     }
 }
 
@@ -193,10 +193,10 @@ function addJpgImage(elementId) {
         path.value = imagePath;
         image.src  = 'file://'+imagePath;
         var theForm = top["authoringIFrame1"].document.getElementById('contentForm')
-        if (!theForm) 
+        if (!theForm)
             theForm = document.getElementById('contentForm')
         theForm.action.value = "addJpgImage"
-        theForm.object.value = elementId 
+        theForm.object.value = elementId
         theForm.submit()
     }
 }
@@ -257,7 +257,7 @@ function changeGalleryImage(galleryId, imageId) {
     }
 }
 
-// Called by the tinyMCE (as per the user's request) to provide an 
+// Called by the tinyMCE (as per the user's request) to provide an
 // image file name to add to the package's field and idevice
 function chooseImage_viaTinyMCE(field_name, url, type, win) {
 
@@ -281,7 +281,7 @@ function chooseImage_viaTinyMCE(field_name, url, type, win) {
             return;
             // UNLESS this causes problems with embedding real filenames w/ #!!
             // But this will only be for links or filenames typed by hand;
-            // those textlink URLs inserted via its file browser will use 
+            // those textlink URLs inserted via its file browser will use
             // type=file rather than type=file2insert
         }
         // new direct insert capabilities, no file browser needed.
@@ -302,14 +302,14 @@ function chooseImage_viaTinyMCE(field_name, url, type, win) {
     var unescaped_local_imagePath = unescape(local_imagePath);
     var oldImageStr = new String(unescaped_local_imagePath);
 
-    // and replace path delimiters (':', '\', or '/') or '%', ' ', or '&' 
+    // and replace path delimiters (':', '\', or '/') or '%', ' ', or '&'
     // with '_':
     var RegExp1 = /[\ \\\/\:\%\&]/g;
     var ReplaceStr1 = new String("_");
     var newImageStr = oldImageStr.replace(RegExp1, ReplaceStr1);
 
     // For simplicity across various file encoding schemes, etc.,
-    // just ensure that the TinyMCE media window also gets a URI safe link, 
+    // just ensure that the TinyMCE media window also gets a URI safe link,
     // for doing its showPreview():
     early_preview_imageName = encodeURIComponent(newImageStr);
     // and one more escaping of the '%'s to '_'s, to flatten for simplicity:
@@ -318,12 +318,12 @@ function chooseImage_viaTinyMCE(field_name, url, type, win) {
 
     // pass the file information on to the server,
     // to copy it into the server's "previews" directory:
-    window.parent.nevow_clientToServerEvent('previewTinyMCEimage', this, 
-                  '', win, win.name, field_name, unescaped_local_imagePath, 
+    window.parent.nevow_clientToServerEvent('previewTinyMCEimage', this,
+                  '', win, win.name, field_name, unescaped_local_imagePath,
                   preview_imageName)
 
     // first, clear out any old value in the tinyMCE image filename field:
-    win.document.forms[0].elements[field_name].value = ""; 
+    win.document.forms[0].elements[field_name].value = "";
 
     // PreviewImage is only available for images:
     if (type == "image") {
@@ -346,8 +346,8 @@ function chooseImage_viaTinyMCE(field_name, url, type, win) {
        win.generatePreview(full_previewImage_url);
     }
 
-    // this onchange works, but it's dirty because it is hardcoding the 
-    // onChange=".." event of that field, and if that were to ever change 
+    // this onchange works, but it's dirty because it is hardcoding the
+    // onChange=".." event of that field, and if that were to ever change
     // in tinyMCE, then this would be out of sync.
 
     // and finally, be sure to update the tinyMCE window's image data:
@@ -358,10 +358,10 @@ function chooseImage_viaTinyMCE(field_name, url, type, win) {
         if (window.tinyMCE.getImageData) {
            window.tinyMCE.getImageData();
         }
-    }    
+    }
 }
 
-// Called by the tinyMCE (as per the user's request) to generate an 
+// Called by the tinyMCE (as per the user's request) to generate an
 // image file of the specified math (LaTeX source, compiled by mimetex)
 // to add to the package's field and idevice
 function makeMathImage_viaTinyMCE(field_name, src_latex, font_size, type, win) {
@@ -375,18 +375,18 @@ function makeMathImage_viaTinyMCE(field_name, src_latex, font_size, type, win) {
     // to help unique-ify each previewed math image:
     var preview_basename = "eXe_LaTeX_math_"+curr_edits_math_num
     var preview_math_imagefile = preview_basename+".gif"
-    // Simplify the subsequent file-lookup process,  by just appending 
+    // Simplify the subsequent file-lookup process,  by just appending
     // the ".tex" to the full image name, as such:
     var preview_math_srcfile = preview_math_imagefile+".tex"
-   
+
     curr_edits_math_num += 1
 
     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
     // pass the file information on to the server,
     // to generate the image into the server's "previews" directory:
-    window.parent.nevow_clientToServerEvent('generateTinyMCEmath', this, 
-                  '', win, win.name, field_name, 
-                  src_latex, font_size, preview_math_imagefile, 
+    window.parent.nevow_clientToServerEvent('generateTinyMCEmath', this,
+                  '', win, win.name, field_name,
+                  src_latex, font_size, preview_math_imagefile,
                   preview_math_srcfile)
 
     // once the image has been generated, it SHOULD be sitting here:
@@ -395,12 +395,12 @@ function makeMathImage_viaTinyMCE(field_name, src_latex, font_size, type, win) {
     win.focus();
 
     // clear out any old value in the tinyMCE image filename field:
-    win.document.forms[0].elements[field_name].value = ""; 
+    win.document.forms[0].elements[field_name].value = "";
     // PreviewImage is only available for images:
     if (type == "image") {
        win.showPreviewImage(" ");
     }
-    // the above two commands are the only way to really 
+    // the above two commands are the only way to really
     // ensure that we can trigger the onchange event below:
 
     // set the tinyMCE image filename field:
@@ -422,11 +422,11 @@ function magnifierImageChanged(event) {
     var height = document.getElementById('height'+elementId);
     image.removeAttribute('height');
     if (image.width > 700){
-        image.width = 600        
+        image.width = 600
         }
     if (image.width <= 700 && image.width > 300)
         image.width = image.width * 0.7
-        
+
     if (image.height > 270){
         width.value = image.width + 84
     }else{
@@ -620,16 +620,16 @@ function showMe(ident, w, h)
 {
     var elmDiv = document.getElementById('popupmessage');
     hideMe();
-        
-    if (!elmDiv || 
+
+    if (!elmDiv ||
         elmDiv.innerHTML != document.getElementById(ident).innerHTML){
 
         elmDiv = document.createElement('div');
         elmDiv.id = 'popupmessage';
         elmDiv.className="popupDiv";
 	var xloc = (xpos+w > 740) ? Math.max(0, xpos-w-15) : xpos;
-        elmDiv.style.cssText = 'position:absolute; left: ' + 
-                               (xloc) + 'px; top: '+(ypos - h/2) + 
+        elmDiv.style.cssText = 'position:absolute; left: ' +
+                               (xloc) + 'px; top: '+(ypos - h/2) +
                                'px; width: ' + w + 'px;';
         elmDiv.innerHTML = document.getElementById(ident).innerHTML;
         document.body.appendChild(elmDiv);
@@ -669,9 +669,9 @@ function clearHidden()
     theForm.object.value = "";
 }
 
-// Sets the hidden action and object fields, then submits the 
+// Sets the hidden action and object fields, then submits the
 // contentForm to the server
-function submitLink(action, object, changed) 
+function submitLink(action, object, changed)
 {
     var theForm = top["authoringIFrame1"].document.getElementById('contentForm')
     if (!theForm) {
@@ -688,7 +688,7 @@ function submitLink(action, object, changed)
 
 
 // Check the user really really wants to do this before submitting
-function confirmThenSubmitLink(message, action, object, changed) 
+function confirmThenSubmitLink(message, action, object, changed)
 {
     if (confirm(message)) {
         submitLink(action, object, changed);
@@ -696,7 +696,7 @@ function confirmThenSubmitLink(message, action, object, changed)
 }
 
 function getFeedback(optionId, optionsNum, ideviceId, mode) {
-    for (i = 0; i< optionsNum; i++) { 
+    for (i = 0; i< optionsNum; i++) {
         if (mode == "multi")
             id = "sa" + i + "b" +ideviceId
         else
@@ -714,12 +714,12 @@ function getFeedback(optionId, optionsNum, ideviceId, mode) {
 
 // Cloze Field Stuff /////////////////////////////////////////////////
 
-// Constants 
+// Constants
 NOT_ATTEMPTED = 0
 WRONG = 1
 CORRECT = 2
 
-// Functions 
+// Functions
 
 // Called when a learner types something into a cloze word space
 function onClozeChange(ele) {
@@ -857,7 +857,7 @@ function markClozeWord(ele, mark) {
             // Wrong
             ele.style.backgroundColor = "red";
             break;
-        case 2: 
+        case 2:
             // Correct
             ele.style.backgroundColor = "lime";
             break;
@@ -1002,7 +1002,7 @@ function checkClozeWord(ele) {
 function getClozeIds(ele) {
     // Extract the idevice id and the input number out of the element's id
     // id is "clozeBlank%s.%s" % (idevice.id, input number)
-    var id = ele.id.slice(10); 
+    var id = ele.id.slice(10);
     var dotindex = id.indexOf('.')
     var ident = id.slice(0, dotindex)
     var inputId = id.slice(id.indexOf('.')+1)
@@ -1055,7 +1055,7 @@ function recurseFindClozeInputs(dad, ident, result) {
         }
     }
 }
-    
+
 
 // Pass the cloze element's id, and the visible property of the feedback element
 // associated with it will be toggled. If there is no feedback field, does
@@ -1098,11 +1098,11 @@ function showAnswer(id,isShow) {
 }
 
 //change forum or discussion topic or lms for discussion idevice.
-function submitChange(action, selectId) 
+function submitChange(action, selectId)
 {
-    var form = document.getElementById("contentForm")      
+    var form = document.getElementById("contentForm")
     form.action.value = action
-    var select = document.getElementById(selectId) 
+    var select = document.getElementById(selectId)
     form.object.value = select.value;
     form.isChanged.value = 1;
     form.submit();
@@ -1123,7 +1123,7 @@ function toggleFeedback(id) {
 //insertAtCursor(document.formName.fieldName, this value);
 function insertAtCursor(myField, myValue, num) {
     //MOZILLA/NETSCAPE support
-   
+
     if (myField.selectionStart || myField.selectionStart == '0') {
         var startPos = myField.selectionStart;
         var endPos = myField.selectionEnd;
@@ -1133,7 +1133,7 @@ function insertAtCursor(myField, myValue, num) {
         myField.selectionStart = startPos + myValue.length - num
     } else {
         myField.value += myValue;
-    } 
+    }
     myField.selectionEnd = myField.selectionStart
     myField.focus();
 }
@@ -1148,15 +1148,15 @@ function insertSymbol(id, string, num){
 function calcScore(num, ident){
     var score = 0;
     for(i=0; i<num; i++){
-        var chkele = document.getElementById(ident+i.toString());        
+        var chkele = document.getElementById(ident+i.toString());
         var ansele = document.getElementById("ans"+ident+i.toString())
         chk = "False"
         if (chkele.checked==1)
-            chk = "True"   
+            chk = "True"
         if (chk == chkele.value){
             score++
             ansele.style.color = "black"
-        }else{            
+        }else{
             ansele.style.color = "red"
         }
     }
@@ -1165,7 +1165,7 @@ function calcScore(num, ident){
     alert(YOUR_SCORE_IS  + score + "/" + num)
 }
 
-// used to show question's feedback for multi-select idevice 
+// used to show question's feedback for multi-select idevice
 function showFeedback(num, ident){
     for(i=0; i<num; i++){
         var ele = document.getElementById(ident+i.toString())
@@ -1174,12 +1174,12 @@ function showFeedback(num, ident){
         var ansele = document.getElementById("ans"+ident+i.toString())
         chk = "False"
         if (ele.checked==1)
-            chk = "True"   
+            chk = "True"
         if (chk == ele.value){
             ele1.style.display = "block"
 			ele0.style.display = "none"
             ansele.style.color = "black"
-        }else{            
+        }else{
             ele0.style.display = "block"
 			ele1.style.display = "none"
             ansele.style.color = "red"
@@ -1204,12 +1204,12 @@ function detectReal() {
 }
 
 function detectFlash() {
-    pluginFound = detectPlugin('Shockwave','Flash'); 
+    pluginFound = detectPlugin('Shockwave','Flash');
      return pluginFound;
 }
 
-function detectDirector() { 
-    pluginFound = detectPlugin('Shockwave','Director'); 
+function detectDirector() {
+    pluginFound = detectPlugin('Shockwave','Director');
      return pluginFound;
 }
 
@@ -1233,11 +1233,11 @@ function detectPlugin() {
 	    var numFound = 0;
 	    for(namesCounter=0; namesCounter < daPlugins.length; namesCounter++) {
 		// if desired plugin name is found in either plugin name or description
-		if( (navigator.plugins[pluginsArrayCounter].name.indexOf(daPlugins[namesCounter]) >= 0) || 
+		if( (navigator.plugins[pluginsArrayCounter].name.indexOf(daPlugins[namesCounter]) >= 0) ||
 		    (navigator.plugins[pluginsArrayCounter].description.indexOf(daPlugins[namesCounter]) >= 0) ) {
 		    // this name was found
 		    numFound++;
-		}   
+		}
 	    }
 	    // now that we have checked all the required names against this one plugin,
 	    // if the number we found matches the total number provided then we were successful

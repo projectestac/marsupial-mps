@@ -325,14 +325,14 @@ if ($INSTALL['stage'] == DATABASE) {
 // IECISA *********** ADDED -> if connection with db was succesfull create tables
     else{
         if ($db->Connect($INSTALL['dbhost'],$INSTALL['dbuser'],$INSTALL['dbpass'],$INSTALL['dbname'])){
-        
-            $sql_fixer = $INSTALL['dirrootform'].'/install/db/install.sql'; 
-        
+
+            $sql_fixer = $INSTALL['dirrootform'].'/install/db/install.sql';
+
             if (!filesize($sql_fixer) || !modify_database($sql_fixer)){
         	    $errormsg = get_string('dbcreationerror', 'install');
                 $nextstage = DATABASE;
             }
-        
+
             $db->Close();
         }
     }
@@ -605,7 +605,7 @@ function form_table($nextstage = WELCOME, $formaction = "install.php") {
 
     $enablenext = true;
 
-    /// Print the standard form 
+    /// Print the standard form
         $needtoopenform = false;
 ?>
     <form id="installform" method="post" action="<?php echo $formaction ?>">
@@ -649,7 +649,7 @@ function form_table($nextstage = WELCOME, $formaction = "install.php") {
             /// Check unsupported PHP configuration
             print_compatibility_row(!ini_get_bool('register_globals'), get_string('globalsquotes', 'install'), get_string('globalswarning', 'install'));
             $enablenext = $enablenext && !ini_get_bool('register_globals');
-            /// Check safe mode 
+            /// Check safe mode
             print_compatibility_row(!ini_get_bool('safe_mode'), get_string('safemode', 'install'), get_string('safemodeerror', 'install'), 'safemodehelp', true);
             /// Check file uploads
             print_compatibility_row(ini_get_bool('file_uploads'), get_string('fileuploads', 'install'), get_string('fileuploadserror', 'install'), 'fileuploadshelp', true);
@@ -724,7 +724,7 @@ function form_table($nextstage = WELCOME, $formaction = "install.php") {
 
 <?php
             break;
-        
+
         default:
     }
 ?>
@@ -907,9 +907,9 @@ function css_styles() {
 ?>
 
 	<style type="text/css">
-	
+
 	    body { background-color: #fafafa; }
-	    p, li, td { 
+	    p, li, td {
 	        font-family: helvetica, arial, sans-serif;
 	        font-size: 10pt;
 	    }
@@ -1017,11 +1017,11 @@ function css_styles() {
 	        margin-bottom: 0px;
 	    }
 	    /* This override the p tag for every p tag in this installation script,
-	       but not in lang\xxx\installer.php 
+	       but not in lang\xxx\installer.php
 	      */
 	    .p_install {
 	        margin-top: 0px;
-	        margin-bottom: 0px; 
+	        margin-bottom: 0px;
 	    }
 	    .environmenttable {
 	        font-size: 10pt;
@@ -1050,7 +1050,7 @@ function css_styles() {
 	        padding:0px;
 	        margin:0px;
 	    }
-	
+
 	</style>
 
 <?php
@@ -1128,5 +1128,3 @@ function modify_database($sqlfile='', $sqlstring='') {
     return $success;
 
 }
-
-?>
