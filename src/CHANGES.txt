@@ -1,5 +1,14 @@
+Release notes for SIMULADOR EDITORIAL MARSUPIAL (http://mps.xtec.cat)
 
-....::::    SIMULADOR EDITORIAL MARSUPIAL    ::::....
+More information on each of the fixes can be found in the project
+development home at https://github.com/projectestac/marsupial-mps
+
+Changes 15.11.21
+---------------------------------------------------------------------------------------
+ - Removed call to window.parent.enableButtons that causes a security exception on JS
+
+Changes 11.09.12
+---------------------------------------------------------------------------------------
 
 ..::  v.11.09.12  ::..
 
@@ -18,8 +27,8 @@
 - /ws/wsTraking/wsTraking.php
   Send the received state post value from activities to the traking web service server
 
-
-..::  v.11.06.10  ::..
+Changes 11.06.10
+---------------------------------------------------------------------------------------
 
 - /ws/wsAuthentication/wsAuthentication.php (ln 49-52)
   Add parameter Rol to the WSDL definition
