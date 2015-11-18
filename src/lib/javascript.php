@@ -18,8 +18,8 @@
 //*********** END
 ?>
 <!--<style type="text/css">/*<![CDATA[*/ body{behavior:url(<?php echo $CFG->httpswwwroot ?>/lib/csshover.htc);} /*]]>*/</style>-->
-
-<script type="text/javascript" src="<?php echo $CFG->httpswwwroot ?>/lib/javascript-static.js"></script>
+<!-- NADIM -- MODIFICAT -- Hace referencia a un JS pero este JS no existe en el paquete.-->
+<!--<script type="text/javascript" src="<?php echo $CFG->httpswwwroot ?>/lib/javascript-static.js"></script>-->
 <?php 
 
 // IECISA -> MPS ************* DELETED -> take out scripts. They are not useful for us 

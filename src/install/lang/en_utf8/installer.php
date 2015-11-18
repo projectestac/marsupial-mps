@@ -131,7 +131,9 @@ Make sure the upper/lower case is correcti, and you have write permissions on th
 You need a place where Marsupial Publisher Simulator can save uploaded files.  This
 directory must be readable AND WRITEABLE by the web server user 
 (usually \'nobody\' or \'apache\'), but it must not be accessible 
-directly via the web.</p>';
+directly via the web.</p>
+<p><b>Proxy settings:</b>
+If the application server has access to the internet via proxy, then specify proxy settings.</p>';
 $string['dirroot'] = 'Marsupial Publisher Simulator Directory';
 $string['dirrooterror'] = 'The \'Marsupial Publisher Simulator Directory\' setting seems to be incorrect - we can\'t find a Marsupial Publisher Simulator installation there. The value below has been reset.';
 $string['download'] = 'Download';
@@ -309,4 +311,10 @@ $string['wrongzipfilename'] = 'Wrong ZIP file name';
 $string['wwwroot'] = 'Web address';
 $string['wwwrooterror'] = 'The \'Web Address\' does not appear to be valid - this Marsupial Publisher Simulator installation doesn\'t appear to be there. The value below has been reset.';
 $string['ziprequired'] = 'The Zip PHP extension is now required by Marsupial Publisher Simulator, info-ZIP binaries or PclZip library are not used anymore.';
+
+$string['proxy_host'] = 'Proxy host';
+$string['proxy_port'] = 'Porxy port';
+$string['proxy_user'] = 'proxy username';
+$string['proxy_pass'] = 'Proxy password';
+$string['proxy_settings'] = 'Proxy settings';
 ?>

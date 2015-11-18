@@ -92,8 +92,8 @@
 			      <xs:complexType name="EstructuraLibro">
 			        <xs:sequence>
 			          <xs:element minOccurs="0" maxOccurs="1" name="Libros" type="tns:libros" />
-			          <xs:element minOccurs="1" maxOccurs="1" name="Codigo" type="xs:string" />
-			          <xs:element minOccurs="1" maxOccurs="1" name="Descripcion" type="xs:string" />
+			          <xs:element minOccurs="0" maxOccurs="1" name="Codigo" type="xs:string" />
+			          <xs:element minOccurs="0" maxOccurs="1" name="Descripcion" type="xs:string" />
 			        </xs:sequence>
 			      </xs:complexType>
 			      <xs:element name="ObtenerTodos">
@@ -119,8 +119,8 @@
 			              </xs:sequence>
 			            </xs:complexType>
 			          </xs:element>
-			          <xs:element minOccurs="1" maxOccurs="1" name="Codigo" type="xs:string" />
-			          <xs:element minOccurs="1" maxOccurs="1" name="Descripcion" type="xs:string" />
+			          <xs:element minOccurs="0" maxOccurs="1" name="Codigo" type="xs:string" />
+			          <xs:element minOccurs="0" maxOccurs="1" name="Descripcion" type="xs:string" />
 			        </xs:sequence>
 			      </xs:complexType>
 			      <xs:complexType name="DetallesError">

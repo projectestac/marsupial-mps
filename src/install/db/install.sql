@@ -343,11 +343,12 @@ CREATE TABLE `prefix_publishers_credentials` (
 -- --------------------------------------------------------
 
 -- 
--- Estructura de tabla para la tabla `mps_users`
+-- Estructura de tabla para la tabla `mps_user`
 -- 
 
-CREATE TABLE `prefix_users` (
+CREATE TABLE `prefix_user` (
   `id` bigint(10) NOT NULL auto_increment,
+  `auth` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `firstname` varchar(255) NOT NULL,

@@ -117,7 +117,10 @@ Especifiqueu l\'adreça web completa per a accedir a Simulador d\'Editorial Mars
 <p><b>Directori de Simulador d\'Editorial Marsupial:</b>
 Especifiqueu el camí complet del directori d\'aquesta instal·lació. Assegureu-vos que les majúscules/minúscules són correctes i que teniu permisos d\'escriptura en aquesta carpeta, aix&iacute; com en la carpeta d\'un nivell superior on es desar&agrave; el arxiu de configuraci&oacute;.</p>
 <p><b>Directori de dades:</b>
-Necessiteu un lloc on Simulador d\'Editorial Marsupial pugui desar els fitxers que es pengin. L\'usuari del servidor web (generalment \'nobody\' o \'apache\') ha de tenir permisos de lectura i d\'ESCRIPTURA en aquest directori, però no hauria de ser accessible directament via web.</p>';
+Necessiteu un lloc on Simulador d\'Editorial Marsupial pugui desar els fitxers que es pengin. L\'usuari del servidor web (generalment \'nobody\' o \'apache\') ha de tenir permisos de lectura i d\'ESCRIPTURA en aquest directori, però no hauria de ser accessible directament via web.</p>
+<p><b>Configuració del proxy:</b>
+Si el servidor d\'aplicacions té accés a Internet a través de proxy, especifiqueu la configuració del servidor proxy.
+</p>';
 $string['dirroot'] = 'Directori de Simulador d\'Editorial Marsupial';
 $string['dirrooterror'] = 'El paràmetre \'Directori de Simulador d\'Editorial Marsupial\' sembla incorrecte: no s\'hi ha pogut trobat cap instal·lació de Simulador d\'Editorial Marsupial. S\'ha reiniciat el valor del paràmetre.';
 $string['download'] = 'Baixa';
@@ -270,4 +273,11 @@ $string['wrongzipfilename'] = 'El nom del fitxer ZIP és erroni';
 $string['wwwroot'] = 'Adreça web';
 $string['wwwrooterror'] = 'L\'adreça web no sembla vàlida. La instal·lació de Simulador d\'Editorial Marsupial no sembla que sigui en aquesta ubicació,';
 $string['xmlrpcrecommended'] = 'Instal·lar l\'extensió opcional xmlrpc és útil per a la funcionalitat de Simulador d\'Editorial Marsupial en Xarxa.';
+
+
+$string['proxy_host'] = 'Proxy host';
+$string['proxy_port'] = 'Porxy port';
+$string['proxy_user'] = 'Usuari proxy';
+$string['proxy_pass'] = 'Contrasenya proxy';
+$string['proxy_settings'] = 'Configuració de proxy';
 ?>

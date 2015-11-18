@@ -36,6 +36,6 @@ $string['sitenameinfo'] = 'Text that appears at the top of the browser and the w
 $string['time'] ='Time';
 $string['username'] = 'User name';
 $string['yes'] = 'Yes';
-
+$string['msg_final'] = '<!--Simulador Editorial funciona bé-->';
 // ************* END
 ?>

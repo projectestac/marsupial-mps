@@ -3468,7 +3468,9 @@ function theme_setup($theme = '', $params=NULL) {
 /// Define stylesheet loading order
     $CFG->stylesheets = array();
     if ($theme != 'standard') {    /// The standard sheet is always loaded first
-        $CFG->stylesheets[] = $CFG->themewww.'/standard/styles.php'.$paramstring;
+	// **** NADIM --> Modificado --> standard package is not available in the package thats why changed it to mpstheme        
+	//$CFG->stylesheets[] = $CFG->themewww.'/standard/styles.php'.$paramstring;
+	        $CFG->stylesheets[] = $CFG->themewww.'/mpstheme/styles.php'.$paramstring;
     }
     if (!empty($THEME->parent)) {  /// Parent stylesheets are loaded next
         $CFG->stylesheets[] = $CFG->themewww.'/'.$THEME->parent.'/styles.php'.$paramstring;

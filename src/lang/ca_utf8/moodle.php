@@ -36,6 +36,6 @@ $string['sitenameinfo'] = 'Text que apareix a la part superior del explorador i 
 $string['time'] = 'Data';
 $string['username'] = 'Usuari';
 $string['yes'] = 'Si';
-
+$string['msg_final'] = '<!--Simulador Editorial funciona bé-->';
 // ************* END
 ?>
