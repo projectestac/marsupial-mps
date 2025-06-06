@@ -131,7 +131,7 @@ global $HTTPSPAGEREQUIRED;
 
     require_once($CFG->libdir .'/adodb/adodb.inc.php'); // Database access functions
 
-    $db = &ADONewConnection($CFG->dbtype);
+    $db = ADONewConnection($CFG->dbtype);
 
     // See MDL-6760 for why this is necessary. In Moodle 1.8, once we start using NULLs properly,
     // we probably want to change this value to ''.
@@ -281,7 +281,7 @@ global $HTTPSPAGEREQUIRED;
          */
         define('SITEID', 1);
         /// And the 'default' course
-        $COURSE = new object;  // no site created yet
+        $COURSE = new stdClass();  // no site created yet
         $COURSE->id = 1;
     }
 
@@ -581,7 +581,7 @@ global $HTTPSPAGEREQUIRED;
         }
         @session_start();
         if (! isset($_SESSION['SESSION'])) {
-            $_SESSION['SESSION'] = new object;
+            $_SESSION['SESSION'] = new stdClass();
             $_SESSION['SESSION']->session_test = random_string(10);
             if (!empty($_COOKIE['MoodleSessionTest'.$CFG->sessioncookie])) {
                 $_SESSION['SESSION']->has_timed_out = true;
@@ -594,7 +594,7 @@ global $HTTPSPAGEREQUIRED;
             $_COOKIE['MoodleSessionTest'.$CFG->sessioncookie] = $_SESSION['SESSION']->session_test;
         }
         if (! isset($_SESSION['USER']))    {
-            $_SESSION['USER']    = new object;
+            $_SESSION['USER']    = new stdClass();
         }
 
         $SESSION = &$_SESSION['SESSION'];   // Makes them easier to reference
@@ -605,7 +605,7 @@ global $HTTPSPAGEREQUIRED;
     }
     else {
         $SESSION  = NULL;
-        $USER     = new object();
+        $USER     = new stdClass();
         $USER->id = 0; // user not logged in when session disabled
         if (isset($CFG->mnet_localhost_id)) {
             $USER->mnethostid = $CFG->mnet_localhost_id;

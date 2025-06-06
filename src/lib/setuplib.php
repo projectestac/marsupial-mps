@@ -3,13 +3,6 @@
       // setup process, before any of the main libraries are 
       // loaded.
 
-
-/**
- * Simple class
- */
-class object {};
-
-
 /**
  * Initializes our performance info early.
  *
@@ -23,7 +16,7 @@ function init_performance_info() {
 
     global $PERF, $CFG, $USER;
   
-    $PERF = new Object;
+    $PERF = new stdClass();
     $PERF->dbqueries = 0;   
     $PERF->logwrites = 0;
     if (function_exists('microtime')) {
@@ -138,12 +131,21 @@ function get_real_size($size=0) {
     $scan['K'] = 1024;
     $scan['k'] = 1024;
 
+    /*
     while (list($key) = each($scan)) {
         if ((strlen($size)>strlen($key))&&(substr($size, strlen($size) - strlen($key))==$key)) {
             $size = substr($size, 0, strlen($size) - strlen($key)) * $scan[$key];
             break;
         }
     }
+    */
+    foreach ($scan as $key => $value) {
+        if ((strlen($size) > strlen($key)) && (substr($size, -strlen($key)) === $key)) {
+            $size = substr($size, 0, strlen($size) - strlen($key)) * $value;
+            break;
+        }
+    }
+
     return $size;
 }
 

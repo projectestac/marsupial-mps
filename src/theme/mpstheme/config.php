@@ -5,6 +5,7 @@
 /// how Moodle uses this theme.
 ////////////////////////////////////////////////////////////////////////////////
 
+$THEME = new stdClass();
 
 $THEME->sheets = array('styles_layout', 'styles_fonts', 'styles_color');
 

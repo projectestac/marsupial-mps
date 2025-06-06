@@ -1781,7 +1781,7 @@ function xmldb_main_upgrade($oldversion=0) {
                 $normalized     = moodle_strtolower($raw_normalized);
                 // if this tag does not exist in tag table yet
                 if (!$newtag = get_record('tag', 'name', addslashes($normalized), '', '', '', '', 'id')) {
-                    $itag = new object();
+                    $itag = new stdClass();
                     $itag->name         = $normalized;
                     $itag->rawname      = $raw_normalized;
                     $itag->userid       = $oldtag->userid;
@@ -1810,7 +1810,7 @@ function xmldb_main_upgrade($oldversion=0) {
             $db->debug = false;
             while ($blogtag = rs_fetch_next_record($rs)) {
                 if (array_key_exists($blogtag->tagid, $tagrefs)) {
-                    $tag_instance = new object();
+                    $tag_instance = new stdClass();
                     $tag_instance->tagid        = $tagrefs[$blogtag->tagid];
                     $tag_instance->itemtype     = 'blog';
                     $tag_instance->itemid       = $blogtag->entryid;

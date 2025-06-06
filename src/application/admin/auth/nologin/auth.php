@@ -23,17 +23,12 @@ require_once($CFG->libdir.'/authlib.php');
  */
 class auth_plugin_nologin extends auth_plugin_base {
 
-
-    /**
-     * Constructor.
-     */
-    function auth_plugin_nologin() {
+    function __construct() {
         $this->authtype = 'nologin';
     }
 
     /**
      * Do not allow any login.
-     *
      */
     function user_login($username, $password) {
         return false;
@@ -78,5 +73,3 @@ class auth_plugin_nologin extends auth_plugin_base {
     }
 
 }
-
-?>

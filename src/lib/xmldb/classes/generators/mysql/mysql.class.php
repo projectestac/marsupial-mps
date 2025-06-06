@@ -274,7 +274,7 @@ class XMLDBmysql extends XMLDBGenerator {
             foreach ($columns as $key => $column) {
             /// Enum found, let's add it to the constraints list
                 if (!empty($column->enums)) {
-                    $result = new object;
+                    $result = new stdClass();
                     $result->name = $key;
                     $result->description = implode(', ', $column->enums);
                     $results[$key] = $result;

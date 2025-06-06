@@ -127,7 +127,7 @@ function upgrade_18_gradebook($courseid) {
     $order = 1;
 
     // create course category
-    $course_category = new object();
+    $course_category = new stdClass();
     $course_category->courseid     = $courseid;
     $course_category->fullname     = '?';
     $course_category->parent       = null;
@@ -144,7 +144,7 @@ function upgrade_18_gradebook($courseid) {
     }
 
     // create course item
-    $course_item = new object();
+    $course_item = new stdClass();
     $course_item->courseid     = $courseid;
     $course_item->itemtype     = 'course';
     $course_item->iteminstance = $course_category->id;
@@ -170,7 +170,7 @@ function upgrade_18_gradebook($courseid) {
 
     } else {
         foreach ($oldcats as $oldcat) {
-            $category = new object();
+            $category = new stdClass();
             $category->courseid     = $courseid;
             $category->fullname     = addslashes($oldcat->name);
             $category->parent       = $course_category->id;
@@ -189,7 +189,7 @@ function upgrade_18_gradebook($courseid) {
 
             $categories[$oldcat->id] = $category;
 
-            $item = new object();
+            $item = new stdClass();
             $item->courseid        = $courseid;
             $item->itemtype        = 'category';
             $item->iteminstance    = $category->id;
@@ -221,7 +221,7 @@ function upgrade_18_gradebook($courseid) {
             continue; // faulty record
         }
         // proper data are set during activity upgrade or legacy grade fetching
-        $item = new object();
+        $item = new stdClass();
         $item->courseid        = $courseid;
         $item->itemtype        = 'mod';
         $item->itemmodule      = $olditem->modname;
@@ -251,7 +251,7 @@ function upgrade_18_gradebook($courseid) {
             if (!array_key_exists($exception->grade_itemid, $newitems)) {
                 continue; // broken record
             }
-            $grade = new object();
+            $grade = new stdClass();
             $grade->excluded     = time();
             $grade->itemid       = $newitems[$exception->grade_itemid]->id;
             $grade->userid       = $exception->userid;

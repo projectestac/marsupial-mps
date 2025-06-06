@@ -1831,7 +1831,7 @@ function main_upgrade($oldversion=0) {
                         $i = '';
                         foreach ($roles as $role) {
                             if (empty($role->shortname)) {
-                                $updated = new object();
+                                $updated = new stdClass();
                                 $updated->id = $role->id;
                                 $updated->shortname = $name.$i;
                                 update_record('role', $updated);
@@ -1891,7 +1891,7 @@ function main_upgrade($oldversion=0) {
             $i = 0;
             foreach ($roles as $rolex) {
                 if ($rolex->sortorder != $i) {
-                    $r = new object();
+                    $r = new stdClass();
                     $r->id = $rolex->id;
                     $r->sortorder = $i;
                     update_record('role', $r);

@@ -1617,7 +1617,7 @@ function document_file($file, $include=true) {
     $langs = array(current_language(), get_string('parentlanguage'), 'en');
 
     foreach ($langs as $lang) {
-        $info = new object();
+        $info = new stdClass();
         $info->filepath = $CFG->dirroot .'/lang/'. $lang .'/docs/'. $file;
         $info->urlpath  = $CFG->wwwroot .'/lang/'. $lang .'/docs/'. $file;
 

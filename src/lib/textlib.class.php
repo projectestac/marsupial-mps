@@ -102,7 +102,7 @@ class textlib {
      * textlib_get_instance() function, avoiding the creation of them
      * (following the singleton pattern)
      */
-    function textlib() {
+    public function __construct() {
         /// Instantiate a conversor object some of the methods in typo3
         /// reference to $this and cannot be executed in a static context
         $this->typo3cs = new t3lib_cs();

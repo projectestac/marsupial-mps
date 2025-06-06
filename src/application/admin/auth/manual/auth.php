@@ -25,7 +25,7 @@ class auth_plugin_manual extends auth_plugin_base {
     /**
      * Constructor.
      */
-    function auth_plugin_manual() {
+    function __construct() {
         $this->authtype = 'manual';
         $this->config = get_config('auth/manual');
     }
@@ -134,20 +134,17 @@ class auth_plugin_manual extends auth_plugin_base {
         if (!empty($user)) {
             if ($user->confirmed) {
                 return AUTH_CONFIRM_ALREADY;
-            } else { 
-                if (!set_field("user", "confirmed", 1, "id", $user->id)) {
-                    return AUTH_CONFIRM_FAIL;
-                }
-                if (!set_field("user", "firstaccess", time(), "id", $user->id)) {
-                    return AUTH_CONFIRM_FAIL;
-                }
-                return AUTH_CONFIRM_OK;
             }
-        } else  {
-            return AUTH_CONFIRM_ERROR;
+            if (!set_field("user", "confirmed", 1, "id", $user->id)) {
+                return AUTH_CONFIRM_FAIL;
+            }
+            if (!set_field("user", "firstaccess", time(), "id", $user->id)) {
+                return AUTH_CONFIRM_FAIL;
+            }
+            return AUTH_CONFIRM_OK;
         }
+
+        return AUTH_CONFIRM_ERROR;
     }
 
 }
-
-?>

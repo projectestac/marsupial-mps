@@ -1335,7 +1335,7 @@ function main_upgrade($oldversion=0) {
                                                '.$CFG->prefix.'dialogue_entries e
                                          WHERE e.conversationid = c.id')) {
             foreach ($entries as $entry) {
-                $message = new object;
+                $message = new stdClass();
                 $message->useridfrom    = $entry->userid;
                 $message->useridto      = $entry->recipientid;
                 $message->message       = addslashes($entry->text);
@@ -2232,7 +2232,7 @@ function main_upgrade($oldversion=0) {
                         $i = '';
                         foreach ($roles as $role) {
                             if (empty($role->shortname)) {
-                                $updated = new object();
+                                $updated = new stdClass();
                                 $updated->id = $role->id;
                                 $updated->shortname = $name.$i;
                                 update_record('role', $updated);
@@ -2298,7 +2298,7 @@ function main_upgrade($oldversion=0) {
             $i = 0;
             foreach ($roles as $rolex) {
                 if ($rolex->sortorder != $i) {
-                    $r = new object();
+                    $r = new stdClass();
                     $r->id = $rolex->id;
                     $r->sortorder = $i;
                     update_record('role', $r);
