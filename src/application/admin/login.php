@@ -43,7 +43,6 @@ if ($frm = data_submitted()) {
 
 /// First, let's remember where the user was trying to get to before they got here
 if (empty($SESSION->wantsurl)) {
-    var_dump($_SERVER["HTTP_REFERER"]);
     $SESSION->wantsurl = (array_key_exists('HTTP_REFERER', $_SERVER) &&
         $_SERVER["HTTP_REFERER"] != $CFG->wwwroot &&
         $_SERVER["HTTP_REFERER"] != $CFG->wwwroot . '/application/admin/' &&

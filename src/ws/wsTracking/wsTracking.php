@@ -115,12 +115,10 @@ if ($reg_credential = get_record("lms_ws_credentials", "success", "1")) {
             //$result->ActividadOrden = 0;
             //$result->ActividadTitulo = get_string("activity_1", "tracking");
         }
-// XTEC ********* AFEGIT -> Send the received activity post value from activities to the traking web service server
-// 2011.09.02 @mmartinez
+        // Send the received activity post value from activities to the traking web service server
         elseif (isset($_POST['gradeactivity']) && !empty($_POST['gradeactivity'])) {
             $result->idActividad = $_POST['gradeactivity'];
         }
-// ********** FI
         //if there is unit
         if ($reg_session->unitid != null) {
             $result->idUnidad = $reg_session->unitid;
@@ -128,12 +126,10 @@ if ($reg_credential = get_record("lms_ws_credentials", "success", "1")) {
             // $result->UnidadOrden = 0;
             // $result->UnidadTitulo = get_string("unit_1", "tracking");
         }
-// XTEC ********* AFEGIT -> Send the received unit post value from activities to the traking web service server
-// 2011.09.02 @mmartinez
+        // Send the received unit post value from activities to the traking web service server
         elseif (isset($_POST['gradeunit']) && !empty($_POST['gradeunit'])) {
             $result->idUnidad = $_POST['gradeunit'];
         }
-// ********** FI
 
         $result->idCentro = $reg_session->centerid;
         $result->idContenidoLMS = $reg_session->lmscontentid;
@@ -142,14 +138,10 @@ if ($reg_credential = get_record("lms_ws_credentials", "success", "1")) {
 
         $result->Resultado = new Resultado();
         //  OPTIONALS FIELDS
-// XTEC ********** MODIFICAT -> Send the received state post value from activities to the traking web service server
-// 2011.09.01 @mmartinez
+        // Send the received state post value from activities to the traking web service server
         if (isset($_POST['gradestate']) && !empty($_POST['gradestate'])) {
             $result->Resultado->Estado = $_POST['gradestate'];
         }
-// ********** ORIGINAL
-        ////$result->Resultado->Estado = 'FINALIZADO';
-// ********** FI
         //$result->Resultado->Intentos = 1;
         //$result->Resultado->MaxIntentos = 1;
         //$result->Resultado->MinCalificacion = 0;
@@ -220,13 +212,12 @@ if ($reg_credential = get_record("lms_ws_credentials", "success", "1")) {
 
         $params = new ResultadoDetalleExtendido();
         $params->ResultadoExtendido = new SoapVar($result, SOAP_ENC_OBJECT, "SeguimientoExtendido", "http://educacio.gencat.cat/agora/seguimiento/");
-//Added proxy settings - Transformacion CPD.        
+        // Proxy settings - Transformacion CPD.        
         if (isset($CFG->proxy_host) && $CFG->proxy_host != "") {
             $client = new soapclient($reg_session->wsurltracking . '?wsdl', array('trace' => 1, 'proxy_host' => $CFG->proxy_host, 'proxy_port' => $CFG->proxy_port, 'proxy_login' => $CFG->proxy_user, 'proxy_password' => $CFG->proxy_pass));
         } else {
             $client = new soapclient($reg_session->wsurltracking . '?wsdl', array('trace' => 1));
         }
-
 
         $auth = array('User' => $reg_credential->username, 'Password' => $reg_credential->password);
 
@@ -243,10 +234,6 @@ if ($reg_credential = get_record("lms_ws_credentials", "success", "1")) {
 
         //delete session information
         if ($response->ResultadoDetalleExtendidoResult->Resultado == 'OK') {
-// XTEC *********** DELETED -> Take out the session delletion to keep it in hierarchical books
-// 2011.09.02 @mmartinez
-            //delete_records("sessions", 'token', $token);
-// ********** FI
             echo "OK";
         } else {
             $descError = "WS response error: " . $response->ResultadoDetalleExtendidoResult->DetalleError->Codigo . " - " . $response->ResultadoDetalleExtendidoResult->DetalleError->Descripcion;  //have to add it to idiomatic files

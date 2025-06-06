@@ -1,4 +1,4 @@
-<?php // $Id$
+<?php
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -227,7 +227,6 @@ define('PARAM_PEM',      0x10000);
  */
 define('PARAM_BASE64',   0x20000);
 
-
 /// Page types ///
 /**
  * PAGE_COURSE_VIEW is a definition of a page type. For more information on the page class see moodle/lib/pagelib.php.
@@ -273,7 +272,6 @@ define ('PASSWORD_NONALPHANUM', '.,;:!?_-+/*@#&$');
 if (!defined('SORT_LOCALE_STRING')) { // PHP < 4.4.0 - TODO: remove in 2.0
     define('SORT_LOCALE_STRING', SORT_STRING);
 }
-
 
 /// PARAMETER HANDLING ////////////////////////////////////////////////////
 
@@ -602,22 +600,6 @@ function clean_param($param, $type) {
 }
 
 /**
- * Return true if given value is integer or string with integer value
- *
- * @param mixed $value String or Int
- * @return bool true if number, false if not
- */
-function is_number($value) {
-    if (is_int($value)) {
-        return true;
-    } else if (is_string($value)) {
-        return ((string)(int)$value) === $value;
-    } else {
-        return false;
-    }
-}
-
-/**
  * Set a key in global configuration
  *
  * Set a key/value pair in both this session's {@link $CFG} global variable
@@ -764,50 +746,6 @@ function unset_config($name, $plugin=NULL) {
         return delete_records('config', 'name', $name);
     } else {
         return delete_records('config_plugins', 'name', $name, 'plugin', $plugin);
-    }
-}
-
-/**
- * Set a volatile flag
- *
- * @param string $type the "type" namespace for the key
- * @param string $name the key to set
- * @param string $value the value to set (without magic quotes) - NULL will remove the flag
- * @param int $expiry (optional) epoch indicating expiry - defaults to now()+ 24hs
- * @return bool
- */
-function set_cache_flag($type, $name, $value, $expiry=NULL) {
-
-
-    $timemodified = time();
-    if ($expiry===NULL || $expiry < $timemodified) {
-        $expiry = $timemodified + 24 * 60 * 60;
-    } else {
-        $expiry = (int)$expiry;
-    }
-
-    if ($value === NULL) {
-        return unset_cache_flag($type,$name);
-    }
-
-    $type = addslashes($type);
-    $name = addslashes($name);
-    if ($f = get_record('cache_flags', 'name', $name, 'flagtype', $type)) { // this is a potentail problem in DEBUG_DEVELOPER
-        if ($f->value == $value and $f->expiry == $expiry and $f->timemodified == $timemodified) {
-            return true; //no need to update; helps rcache too
-        }
-        $f->value        = addslashes($value);
-        $f->expiry       = $expiry;
-        $f->timemodified = $timemodified;
-        return update_record('cache_flags', $f);
-    } else {
-        $f = new stdClass();
-        $f->flagtype     = $type;
-        $f->name         = $name;
-        $f->value        = addslashes($value);
-        $f->expiry       = $expiry;
-        $f->timemodified = $timemodified;
-        return (bool)insert_record('cache_flags', $f);
     }
 }
 
@@ -964,7 +902,6 @@ function get_user_preferences($name=NULL, $default=NULL, $otheruserid=NULL) {
         return $default;              // Default value (or NULL)
     }
 }
-
 
 /// FUNCTIONS FOR HANDLING TIME ////////////////////////////////////////////
 
@@ -1143,23 +1080,6 @@ function usertime($date, $timezone=99) {
         return $date;
     }
     return $date - (int)($timezone * HOURSECS);
-}
-
-/**
- * Given a time, return the GMT timestamp of the most recent midnight
- * for the current user.
- *
- * @param int $date Timestamp in GMT
- * @param float $timezone ?
- * @return ?
- */
-function usergetmidnight($date, $timezone=99) {
-
-    $userdate = usergetdate($date, $timezone);
-
-    // Time of midnight of this user's day, in GMT
-    return make_timestamp($userdate['year'], $userdate['mon'], $userdate['mday'], 0, 0, 0, $timezone);
-
 }
 
 /**
@@ -1531,7 +1451,6 @@ function sesskey() {
     return $USER->sesskey;
 }
 
-
 /**
  * For security purposes, this function will check that the currently
  * given sesskey (passed as a parameter to the script or this function)
@@ -1590,259 +1509,6 @@ function course_setup($courseorid=0) {
     moodle_setlocale();
     theme_setup();
 
-}
-
-/**
- * This function checks that the current user is logged in and has the
- * required privileges
- *
- * This function checks that the current user is logged in, and optionally
- * whether they are allowed to be in a particular course and view a particular
- * course module.
- * If they are not logged in, then it redirects them to the site login unless
- * $autologinguest is set and {@link $CFG}->autologinguests is set to 1 in which
- * case they are automatically logged in as guests.
- * If $courseid is given and the user is not enrolled in that course then the
- * user is redirected to the course enrolment page.
- * If $cm is given and the coursemodule is hidden and the user is not a teacher
- * in the course then the user is redirected to the course home page.
- *
- * @uses $CFG
- * @uses $SESSION
- * @uses $USER
- * @uses $FULLME
- * @uses SITEID
- * @uses $COURSE
- * @param mixed $courseorid id of the course or course object
- * @param bool $autologinguest
- * @param object $cm course module object
- * @param bool $setwantsurltome Define if we want to set $SESSION->wantsurl, defaults to
- *             true. Used to avoid (=false) some scripts (file.php...) to set that variable,
- *             in order to keep redirects working properly. MDL-14495
- */
-function require_login($courseorid=0, $autologinguest=true, $cm=null, $setwantsurltome=true) {
-
-    global $CFG, $SESSION, $USER, $COURSE, $FULLME;
-
-/// setup global $COURSE, themes, language and locale
-    course_setup($courseorid);
-
-/// If the user is not even logged in yet then make sure they are
-    if (!isloggedin()) {
-        //NOTE: $USER->site check was obsoleted by session test cookie,
-        //      $USER->confirmed test is in login/index.php
-        if ($setwantsurltome) {
-            $SESSION->wantsurl = $FULLME;
-        }
-        if (!empty($_SERVER['HTTP_REFERER'])) {
-            $SESSION->fromurl  = $_SERVER['HTTP_REFERER'];
-        }
-        if ($autologinguest and !empty($CFG->guestloginbutton) and !empty($CFG->autologinguests) and ($COURSE->id == SITEID or $COURSE->guest) ) {
-            $loginguest = '?loginguest=true';
-        } else {
-            $loginguest = '';
-        }
-        if (empty($CFG->loginhttps) or $loginguest) { //do not require https for guest logins
-            redirect($CFG->wwwroot .'/login/index.php'. $loginguest);
-        } else {
-            $wwwroot = str_replace('http:','https:', $CFG->wwwroot);
-            redirect($wwwroot .'/login/index.php');
-        }
-        exit;
-    }
-
-/// loginas as redirection if needed
-    if ($COURSE->id != SITEID and !empty($USER->realuser)) {
-        if ($USER->loginascontext->contextlevel == CONTEXT_COURSE) {
-            if ($USER->loginascontext->instanceid != $COURSE->id) {
-                print_error('loginasonecourse', '', $CFG->wwwroot.'/course/view.php?id='.$USER->loginascontext->instanceid);
-            }
-        }
-    }
-
-/// check whether the user should be changing password (but only if it is REALLY them)
-    if (get_user_preferences('auth_forcepasswordchange') && empty($USER->realuser)) {
-        $userauth = get_auth_plugin($USER->auth);
-        if ($userauth->can_change_password()) {
-            $SESSION->wantsurl = $FULLME;
-            if ($changeurl = $userauth->change_password_url()) {
-                //use plugin custom url
-                redirect($changeurl);
-            } else {
-                //use moodle internal method
-                if (empty($CFG->loginhttps)) {
-                    redirect($CFG->wwwroot .'/login/change_password.php');
-                } else {
-                    $wwwroot = str_replace('http:','https:', $CFG->wwwroot);
-                    redirect($wwwroot .'/login/change_password.php');
-                }
-            }
-        } else {
-            print_error('nopasswordchangeforced', 'auth');
-        }
-    }
-
-/// Check that the user account is properly set up
-    if (user_not_fully_set_up($USER)) {
-        $SESSION->wantsurl = $FULLME;
-        redirect($CFG->wwwroot .'/user/edit.php?id='. $USER->id .'&amp;course='. SITEID);
-    }
-
-/// Make sure current IP matches the one for this session (if required)
-    if (!empty($CFG->tracksessionip)) {
-        if ($USER->sessionIP != md5(getremoteaddr())) {
-            print_error('sessionipnomatch', 'error');
-        }
-    }
-
-/// Make sure the USER has a sesskey set up.  Used for checking script parameters.
-    sesskey();
-
-    // Check that the user has agreed to a site policy if there is one
-    if (!empty($CFG->sitepolicy)) {
-        if (!$USER->policyagreed) {
-            $SESSION->wantsurl = $FULLME;
-            redirect($CFG->wwwroot .'/user/policy.php');
-        }
-    }
-
-    // Fetch the system context, we are going to use it a lot.
-    $sysctx = get_context_instance(CONTEXT_SYSTEM);
-
-/// If the site is currently under maintenance, then print a message
-    if (!has_capability('moodle/site:config', $sysctx)) {
-        if (file_exists($CFG->dataroot.'/'.SITEID.'/maintenance.html')) {
-            print_maintenance_message();
-            exit;
-        }
-    }
-
-/// groupmembersonly access control
-    if (!empty($CFG->enablegroupings) and $cm and $cm->groupmembersonly and !has_capability('moodle/site:accessallgroups', get_context_instance(CONTEXT_MODULE, $cm->id))) {
-        if (isguestuser() or !groups_has_membership($cm)) {
-            print_error('groupmembersonlyerror', 'group', $CFG->wwwroot.'/course/view.php?id='.$cm->course);
-        }
-    }
-
-    // Fetch the course context, and prefetch its child contexts
-    if (!isset($COURSE->context)) {
-        if ( ! $COURSE->context = get_context_instance(CONTEXT_COURSE, $COURSE->id) ) {
-            print_error('nocontext');
-        }
-    }
-    if (!empty($cm) && !isset($cm->context)) {
-        if ( ! $cm->context = get_context_instance(CONTEXT_MODULE, $cm->id) ) {
-            print_error('nocontext');
-        }
-    }
-    if ($COURSE->id == SITEID) {
-        /// Eliminate hidden site activities straight away
-        if (!empty($cm) && !$cm->visible
-            && !has_capability('moodle/course:viewhiddenactivities', $cm->context)) {
-            redirect($CFG->wwwroot, get_string('activityiscurrentlyhidden'));
-        }
-        user_accesstime_log($COURSE->id); /// Access granted, update lastaccess times
-        return;
-
-    } else {
-
-        /// Check if the user can be in a particular course
-        if (empty($USER->access['rsw'][$COURSE->context->path])) {
-            //
-            // MDL-13900 - If the course or the parent category are hidden
-            // and the user hasn't the 'course:viewhiddencourses' capability, prevent access
-            //
-            if ( !($COURSE->visible && course_parent_visible($COURSE)) &&
-                   !has_capability('moodle/course:viewhiddencourses', $COURSE->context)) {
-                print_header_simple();
-                notice(get_string('coursehidden'), $CFG->wwwroot .'/');
-            }
-        }
-
-    /// Non-guests who don't currently have access, check if they can be allowed in as a guest
-
-        if ($USER->username != 'guest' and !has_capability('moodle/course:view', $COURSE->context)) {
-            if ($COURSE->guest == 1) {
-                 // Temporarily assign them guest role for this context, if it fails later user is asked to enrol
-                 $USER->access = load_temp_role($COURSE->context, $CFG->guestroleid, $USER->access);
-            }
-        }
-
-    /// If the user is a guest then treat them according to the course policy about guests
-
-        if (has_capability('moodle/legacy:guest', $COURSE->context, NULL, false)) {
-            if (has_capability('moodle/site:doanything', $sysctx)) {
-                // administrators must be able to access any course - even if somebody gives them guest access
-                user_accesstime_log($COURSE->id); /// Access granted, update lastaccess times
-                return;
-            }
-
-            switch ($COURSE->guest) {    /// Check course policy about guest access
-
-                case 1:    /// Guests always allowed
-                    if (!has_capability('moodle/course:view', $COURSE->context)) {    // Prohibited by capability
-                        print_header_simple();
-                        notice(get_string('guestsnotallowed', '', format_string($COURSE->fullname)), "$CFG->wwwroot/login/index.php");
-                    }
-                    if (!empty($cm) and !$cm->visible) { // Not allowed to see module, send to course page
-                        redirect($CFG->wwwroot.'/course/view.php?id='.$cm->course,
-                                 get_string('activityiscurrentlyhidden'));
-                    }
-
-                    user_accesstime_log($COURSE->id); /// Access granted, update lastaccess times
-                    return;   // User is allowed to see this course
-
-                    break;
-
-                case 2:    /// Guests allowed with key
-                    if (!empty($USER->enrolkey[$COURSE->id])) {   // Set by enrol/manual/enrol.php
-                        user_accesstime_log($COURSE->id); /// Access granted, update lastaccess times
-                        return true;
-                    }
-                    //  otherwise drop through to logic below (--> enrol.php)
-                    break;
-
-                default:    /// Guests not allowed
-                    $strloggedinasguest = get_string('loggedinasguest');
-                    print_header_simple('', '',
-                            build_navigation(array(array('name' => $strloggedinasguest, 'link' => null, 'type' => 'misc'))));
-                    if (empty($USER->access['rsw'][$COURSE->context->path])) {  // Normal guest
-                        notice(get_string('guestsnotallowed', '', format_string($COURSE->fullname)), "$CFG->wwwroot/login/index.php");
-                    } else {
-                        notify(get_string('guestsnotallowed', '', format_string($COURSE->fullname)));
-                        echo '<div class="notifyproblem">'.switchroles_form($COURSE->id).'</div>';
-                        print_footer($COURSE);
-                        exit;
-                    }
-                    break;
-            }
-
-    /// For non-guests, check if they have course view access
-
-        } else if (has_capability('moodle/course:view', $COURSE->context)) {
-            if (!empty($USER->realuser)) {   // Make sure the REAL person can also access this course
-                if (!has_capability('moodle/course:view', $COURSE->context, $USER->realuser)) {
-                    print_header_simple();
-                    notice(get_string('studentnotallowed', '', fullname($USER, true)), $CFG->wwwroot .'/');
-                }
-            }
-
-        /// Make sure they can read this activity too, if specified
-
-            if (!empty($cm) && !$cm->visible && !has_capability('moodle/course:viewhiddenactivities', $cm->context)) {
-                redirect($CFG->wwwroot.'/course/view.php?id='.$cm->course, get_string('activityiscurrentlyhidden'));
-            }
-            user_accesstime_log($COURSE->id); /// Access granted, update lastaccess times
-            return;   // User is allowed to see this course
-
-        }
-
-
-    /// Currently not enrolled in the course, so see if they want to enrol
-        $SESSION->wantsurl = $FULLME;
-        redirect($CFG->wwwroot .'/course/enrol.php?id='. $COURSE->id);
-        die;
-    }
 }
 
 /**
@@ -1911,16 +1577,6 @@ function update_user_login_times() {
     return update_record('user', $user);
 }
 
-/**
- * Determines if a user has completed setting up their account.
- *
- * @param user $user A {@link $USER} object to test for the existance of a valid name and email
- * @return bool
- */
-function user_not_fully_set_up($user) {
-    return ($user->username != 'guest' and (empty($user->firstname) or empty($user->lastname) or empty($user->email) or over_bounce_threshold($user)));
-}
-
 function over_bounce_threshold($user) {
 
     global $CFG;
@@ -1968,24 +1624,6 @@ function set_send_count($user,$reset=false) {
     else if (!empty($reset)) { // if it's not there and we're resetting, don't bother.
         // make a new one
         $pref->name = 'email_send_count';
-        $pref->value = 1;
-        $pref->userid = $user->id;
-        insert_record('user_preferences',$pref, false);
-    }
-}
-
-/**
-* @param $user - object containing an id
- * @param $reset - will reset the count to 0
- */
-function set_bounce_count($user,$reset=false) {
-    if ($pref = get_record('user_preferences','userid',$user->id,'name','email_bounce_count')) {
-        $pref->value = (!empty($reset)) ? 0 : $pref->value+1;
-        update_record('user_preferences',$pref);
-    }
-    else if (!empty($reset)) { // if it's not there and we're resetting, don't bother.
-        // make a new one
-        $pref->name = 'email_bounce_count';
         $pref->value = 1;
         $pref->userid = $user->id;
         insert_record('user_preferences',$pref, false);
@@ -2244,22 +1882,6 @@ function exists_auth_plugin($auth) {
 }
 
 /**
- * Checks if a given plugin is in the list of enabled authentication plugins.
- *
- * @param string $auth Authentication plugin.
- * @return boolean Whether the plugin is enabled.
- */
-function is_enabled_auth($auth) {
-    if (empty($auth)) {
-        return false;
-    }
-
-    $enabled = get_enabled_auth_plugins();
-
-    return in_array($auth, $enabled);
-}
-
-/**
  * Returns an authentication plugin instance.
  *
  * @uses $CFG
@@ -2314,146 +1936,6 @@ function get_enabled_auth_plugins($fix=false) {
     }
 
     return (array_merge($default, $auths));
-}
-
-/**
- * Creates a bare-bones user record
- *
- * @uses $CFG
- * @param string $username New user's username to add to record
- * @param string $password New user's password to add to record
- * @param string $auth Form of authentication required
- * @return object A {@link $USER} object
- * @todo Outline auth types and provide code example
- */
-function create_user_record($username, $password, $auth='manual') {
-    global $CFG;
-
-    //just in case check text case
-    $username = trim(moodle_strtolower($username));
-
-    $authplugin = get_auth_plugin($auth);
-
-    if ($newinfo = $authplugin->get_userinfo($username)) {
-        $newinfo = truncate_userinfo($newinfo);
-        foreach ($newinfo as $key => $value){
-            $newuser->$key = addslashes($value);
-        }
-    }
-
-    if (!empty($newuser->email)) {
-        if (email_is_not_allowed($newuser->email)) {
-            unset($newuser->email);
-        }
-    }
-
-    if (!isset($newuser->city)) {
-        $newuser->city = '';
-    }
-
-    $newuser->auth = $auth;
-    $newuser->username = $username;
-
-    // fix for MDL-8480
-    // user CFG lang for user if $newuser->lang is empty
-    // or $user->lang is not an installed language
-    $sitelangs = array_keys(get_list_of_languages());
-    if (empty($newuser->lang) || !in_array($newuser->lang, $sitelangs)) {
-        $newuser -> lang = $CFG->lang;
-    }
-    $newuser->confirmed = 1;
-    $newuser->lastip = getremoteaddr();
-    if (empty($newuser->lastip)) {
-        $newuser->lastip = '0.0.0.0';
-    }
-    $newuser->timemodified = time();
-    $newuser->mnethostid = $CFG->mnet_localhost_id;
-
-    if (insert_record('user', $newuser)) {
-        $user = get_complete_user_data('username', $newuser->username);
-        if(!empty($CFG->{'auth_'.$newuser->auth.'_forcechangepassword'})){
-            set_user_preference('auth_forcepasswordchange', 1, $user->id);
-        }
-        update_internal_user_password($user, $password);
-        return $user;
-    }
-    return false;
-}
-
-/**
- * Will update a local user record from an external source
- *
- * @uses $CFG
- * @param string $username New user's username to add to record
- * @return user A {@link $USER} object
- */
-function update_user_record($username, $authplugin) {
-    $username = trim(moodle_strtolower($username)); /// just in case check text case
-
-    $oldinfo = get_record('user', 'username', $username, '','','','', 'username, auth');
-    $userauth = get_auth_plugin($oldinfo->auth);
-
-    if ($newinfo = $userauth->get_userinfo($username)) {
-        $newinfo = truncate_userinfo($newinfo);
-        foreach ($newinfo as $key => $value){
-            if ($key === 'username') {
-                // 'username' is not a mapped updateable/lockable field, so skip it.
-                continue;
-            }
-            $confval = $userauth->config->{'field_updatelocal_' . $key};
-            $lockval = $userauth->config->{'field_lock_' . $key};
-            if (empty($confval) || empty($lockval)) {
-                continue;
-            }
-            if ($confval === 'onlogin') {
-                $value = addslashes($value);
-                // MDL-4207 Don't overwrite modified user profile values with
-                // empty LDAP values when 'unlocked if empty' is set. The purpose
-                // of the setting 'unlocked if empty' is to allow the user to fill
-                // in a value for the selected field _if LDAP is giving
-                // nothing_ for this field. Thus it makes sense to let this value
-                // stand in until LDAP is giving a value for this field.
-                if (!(empty($value) && $lockval === 'unlockedifempty')) {
-                    set_field('user', $key, $value, 'username', $username)
-                        || error_log("Error updating $key for $username");
-                }
-            }
-        }
-    }
-
-    return get_complete_user_data('username', $username);
-}
-
-function truncate_userinfo($info) {
-/// will truncate userinfo as it comes from auth_get_userinfo (from external auth)
-/// which may have large fields
-
-    // define the limits
-    $limit = array(
-                    'username'    => 100,
-                    'idnumber'    => 255,
-                    'firstname'   => 100,
-                    'lastname'    => 100,
-                    'email'       => 100,
-                    'icq'         =>  15,
-                    'phone1'      =>  20,
-                    'phone2'      =>  20,
-                    'institution' =>  40,
-                    'department'  =>  30,
-                    'address'     =>  70,
-                    'city'        =>  20,
-                    'country'     =>   2,
-                    'url'         => 255,
-                    );
-
-    // apply where needed
-    foreach (array_keys($info) as $key) {
-        if (!empty($limit[$key])) {
-            $info[$key] = trim(substr($info[$key],0, $limit[$key]));
-        }
-    }
-
-    return $info;
 }
 
 /**
@@ -2741,196 +2223,6 @@ function set_login_session_preferences() {
         include_once($CFG->dirroot.'/calendar/lib.php');
         calendar_set_filters_status(get_user_preferences('calendar_savedflt', 0xff));
     }
-}
-
-/**
- * Clear a course out completely, deleting all content
- * but don't delete the course itself
- *
- * @uses $CFG
- * @param int $courseid The id of the course that is being deleted
- * @param bool $showfeedback Whether to display notifications of each action the function performs.
- * @return bool true if all the removals succeeded. false if there were any failures. If this
- *             method returns false, some of the removals will probably have succeeded, and others
- *             failed, but you have no way of knowing which.
- */
-function remove_course_contents($courseid, $showfeedback=true) {
-
-    global $CFG;
-    require_once($CFG->libdir.'/questionlib.php');
-    require_once($CFG->libdir.'/gradelib.php');
-
-    $result = true;
-
-    if (! $course = get_record('course', 'id', $courseid)) {
-        error('Course ID was incorrect (can\'t find it)');
-    }
-
-    $strdeleted = get_string('deleted');
-
-/// Clean up course formats (iterate through all formats in the even the course format was ever changed)
-    $formats = get_list_of_plugins('course/format');
-    foreach ($formats as $format) {
-        $formatdelete = $format.'_course_format_delete_course';
-        $formatlib    = "$CFG->dirroot/course/format/$format/lib.php";
-        if (file_exists($formatlib)) {
-            include_once($formatlib);
-            if (function_exists($formatdelete)) {
-                if ($showfeedback) {
-                    notify($strdeleted.' '.$format);
-                }
-                $formatdelete($course->id);
-            }
-        }
-    }
-
-/// Delete every instance of every module
-
-    if ($allmods = get_records('modules') ) {
-        foreach ($allmods as $mod) {
-            $modname = $mod->name;
-            $modfile = $CFG->dirroot .'/mod/'. $modname .'/lib.php';
-            $moddelete = $modname .'_delete_instance';       // Delete everything connected to an instance
-            $moddeletecourse = $modname .'_delete_course';   // Delete other stray stuff (uncommon)
-            $count=0;
-            if (file_exists($modfile)) {
-                include_once($modfile);
-                if (function_exists($moddelete)) {
-                    if ($instances = get_records($modname, 'course', $course->id)) {
-                        foreach ($instances as $instance) {
-                            if ($cm = get_coursemodule_from_instance($modname, $instance->id, $course->id)) {
-                                /// Delete activity context questions and question categories
-                                question_delete_activity($cm,  $showfeedback);
-                            }
-                            if ($moddelete($instance->id)) {
-                                $count++;
-
-                            } else {
-                                notify('Could not delete '. $modname .' instance '. $instance->id .' ('. format_string($instance->name) .')');
-                                $result = false;
-                            }
-                            if ($cm) {
-                                // delete cm and its context in correct order
-                                delete_records('course_modules', 'id', $cm->id);
-                                delete_context(CONTEXT_MODULE, $cm->id);
-                            }
-                        }
-                    }
-                } else {
-                    notify('Function '.$moddelete.'() doesn\'t exist!');
-                    $result = false;
-                }
-
-                if (function_exists($moddeletecourse)) {
-                    $moddeletecourse($course, $showfeedback);
-                }
-            }
-            if ($showfeedback) {
-                notify($strdeleted .' '. $count .' x '. $modname);
-            }
-        }
-    } else {
-        error('No modules are installed!');
-    }
-
-/// Give local code a chance to delete its references to this course.
-    require_once($CFG->libdir.'/locallib.php');
-    notify_local_delete_course($courseid, $showfeedback);
-
-/// Delete course blocks
-
-    if ($blocks = get_records_sql("SELECT *
-                                   FROM {$CFG->prefix}block_instance
-                                   WHERE pagetype = '".PAGE_COURSE_VIEW."'
-                                   AND pageid = $course->id")) {
-        if (delete_records('block_instance', 'pagetype', PAGE_COURSE_VIEW, 'pageid', $course->id)) {
-            if ($showfeedback) {
-                notify($strdeleted .' block_instance');
-            }
-
-            require_once($CFG->libdir.'/blocklib.php');
-            foreach ($blocks as $block) {  /// Delete any associated contexts for this block
-
-                delete_context(CONTEXT_BLOCK, $block->id);
-
-                // fix for MDL-7164
-                // Get the block object and call instance_delete()
-                if (!$record = blocks_get_record($block->blockid)) {
-                    $result = false;
-                    continue;
-                }
-                if (!$obj = block_instance($record->name, $block)) {
-                    $result = false;
-                    continue;
-                }
-                // Return value ignored, in core mods this does not do anything, but just in case
-                // third party blocks might have stuff to clean up
-                // we execute this anyway
-                $obj->instance_delete();
-
-            }
-        } else {
-            $result = false;
-        }
-    }
-
-/// Delete any groups, removing members and grouping/course links first.
-    require_once($CFG->dirroot.'/group/lib.php');
-    groups_delete_groupings($courseid, $showfeedback);
-    groups_delete_groups($courseid, $showfeedback);
-
-/// Delete all related records in other tables that may have a courseid
-/// This array stores the tables that need to be cleared, as
-/// table_name => column_name that contains the course id.
-
-    $tablestoclear = array(
-        'event' => 'courseid', // Delete events
-        'log' => 'course', // Delete logs
-        'course_sections' => 'course', // Delete any course stuff
-        'course_modules' => 'course',
-        'backup_courses' => 'courseid', // Delete scheduled backup stuff
-        'user_lastaccess' => 'courseid',
-        'backup_log' => 'courseid'
-    );
-    foreach ($tablestoclear as $table => $col) {
-        if (delete_records($table, $col, $course->id)) {
-            if ($showfeedback) {
-                notify($strdeleted . ' ' . $table);
-            }
-        } else {
-            $result = false;
-        }
-    }
-
-
-/// Clean up metacourse stuff
-
-    if ($course->metacourse) {
-        delete_records("course_meta","parent_course",$course->id);
-        sync_metacourse($course->id); // have to do it here so the enrolments get nuked. sync_metacourses won't find it without the id.
-        if ($showfeedback) {
-            notify("$strdeleted course_meta");
-        }
-    } else {
-        if ($parents = get_records("course_meta","child_course",$course->id)) {
-            foreach ($parents as $parent) {
-                remove_from_metacourse($parent->parent_course,$parent->child_course); // this will do the unenrolments as well.
-            }
-            if ($showfeedback) {
-                notify("$strdeleted course_meta");
-            }
-        }
-    }
-
-/// Delete questions and question categories
-    question_delete_course($course, $showfeedback);
-
-/// Remove all data from gradebook
-    $context = get_context_instance(CONTEXT_COURSE, $courseid);
-    remove_course_grades($courseid, $showfeedback);
-    remove_grade_letters($context, $showfeedback);
-
-    return $result;
 }
 
 function generate_email_processing_address($modid,$modargs) {
@@ -3277,26 +2569,6 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml='', $a
 }
 
 /**
- * Generate a signoff for emails based on support settings
- *
- */
-function generate_email_signoff() {
-    global $CFG;
-
-    $signoff = "\n";
-    if (!empty($CFG->supportname)) {
-        $signoff .= $CFG->supportname."\n";
-    }
-    if (!empty($CFG->supportemail)) {
-        $signoff .= $CFG->supportemail."\n";
-    }
-    if (!empty($CFG->supportpage)) {
-        $signoff .= $CFG->supportpage."\n";
-    }
-    return $signoff;
-}
-
-/**
  * Generate a fake user for emails based on support settings
  *
  */
@@ -3317,59 +2589,6 @@ function generate_email_supportuser() {
     $supportuser->maildisplay = true;
 
     return $supportuser;
-}
-
-/**
- * Check that an email is allowed.  It returns an error message if there
- * was a problem.
- *
- * @uses $CFG
- * @param  string $email Content of email
- * @return string|false
- */
-function email_is_not_allowed($email) {
-
-    global $CFG;
-
-    if (!empty($CFG->allowemailaddresses)) {
-        $allowed = explode(' ', $CFG->allowemailaddresses);
-        foreach ($allowed as $allowedpattern) {
-            $allowedpattern = trim($allowedpattern);
-            if (!$allowedpattern) {
-                continue;
-            }
-            if (strpos($allowedpattern, '.') === 0) {
-                if (strpos(strrev($email), strrev($allowedpattern)) === 0) {
-                    // subdomains are in a form ".example.com" - matches "xxx@anything.example.com"
-                    return false;
-                }
-
-            } else if (strpos(strrev($email), strrev('@'.$allowedpattern)) === 0) { // Match!   (bug 5250)
-                return false;
-            }
-        }
-        return get_string('emailonlyallowed', '', $CFG->allowemailaddresses);
-
-    } else if (!empty($CFG->denyemailaddresses)) {
-        $denied = explode(' ', $CFG->denyemailaddresses);
-        foreach ($denied as $deniedpattern) {
-            $deniedpattern = trim($deniedpattern);
-            if (!$deniedpattern) {
-                continue;
-            }
-            if (strpos($deniedpattern, '.') === 0) {
-                if (strpos(strrev($email), strrev($deniedpattern)) === 0) {
-                    // subdomains are in a form ".example.com" - matches "xxx@anything.example.com"
-                    return get_string('emailnotallowed', '', $CFG->denyemailaddresses);
-                }
-
-            } else if (strpos(strrev($email), strrev('@'.$deniedpattern)) === 0) { // Match!   (bug 5250)
-                return get_string('emailnotallowed', '', $CFG->denyemailaddresses);
-            }
-        }
-    }
-
-    return false;
 }
 
 /// FILE HANDLING  /////////////////////////////////////////////
@@ -4612,26 +3831,6 @@ function random_string ($length=15) {
         $string .= substr($pool, (mt_rand()%($poollen)), 1);
     }
     return $string;
-}
-
-/**
- * Given a simple array, this shuffles it up just like shuffle()
- * Unlike PHP's shuffle() this function works on any machine.
- *
- * @param array $array The array to be rearranged
- * @return array
- */
-function swapshuffle($array) {
-
-    srand ((double) microtime() * 10000000);
-    $last = count($array) - 1;
-    for ($i=0;$i<=$last;$i++) {
-        $from = rand(0,$last);
-        $curr = $array[$i];
-        $array[$i] = $array[$from];
-        $array[$from] = $curr;
-    }
-    return $array;
 }
 
 /**
