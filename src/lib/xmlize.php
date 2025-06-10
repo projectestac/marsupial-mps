@@ -190,5 +190,3 @@ function traverse_xmlize($array, $arrName = 'array', $level = 0) {
     return 1;
 
 }
-
-?>

@@ -2030,52 +2030,6 @@ function force_strict_header($output) {
 }
 
 /**
- * This version of print_header is simpler because the course name does not have to be
- * provided explicitly in the strings. It can be used on the site page as in courses
- * Eventually all print_header could be replaced by print_header_simple
- *
- * @param string $title Appears at the top of the window
- * @param string $heading Appears at the top of the page
- * @param string $navigation Premade navigation string (for use as breadcrumbs links)
- * @param string $focus Indicates form element to get cursor focus on load eg  inputform.password
- * @param string $meta Meta tags to be added to the header
- * @param boolean $cache Should this page be cacheable?
- * @param string $button HTML code for a button (usually for module editing)
- * @param string $menu HTML code for a popup menu
- * @param boolean $usexml use XML for this page
- * @param string $bodytags This text will be included verbatim in the <body> tag (useful for onload() etc)
- * @param bool   $return If true, return the visible elements of the header instead of echoing them.
- */
-function print_header_simple($title='', $heading='', $navigation='', $focus='', $meta='',
-                       $cache=true, $button='&nbsp;', $menu='', $usexml=false, $bodytags='', $return=false) {
-
-    global $COURSE, $CFG;
-
-    // if we have no navigation specified, build it
-    if( empty($navigation) ){
-       $navigation = build_navigation('');
-    }
-
-    // If old style nav prepend course short name otherwise leave $navigation object alone
-    if (!is_newnav($navigation)) {
-        if ($COURSE->id != SITEID) {
-            $shortname = '<a href="'.$CFG->wwwroot.'/course/view.php?id='. $COURSE->id .'">'. $COURSE->shortname .'</a> ->';
-            $navigation = $shortname.' '.$navigation;
-        }
-    }
-
-    $output = print_header($COURSE->shortname .': '. $title, $COURSE->fullname .' '. $heading, $navigation, $focus, $meta,
-                           $cache, $button, $menu, $usexml, $bodytags, true);
-
-    if ($return) {
-        return $output;
-    } else {
-        echo $output;
-    }
-}
-
-
-/**
  * Can provide a course object to make the footer contain a link to
  * to the course home page, otherwise the link will go to the site home
  * @uses $USER
@@ -2504,7 +2458,7 @@ function style_sheet_setup($lastmodified=0, $lifetime=300, $themename='', $force
 function theme_setup($theme = '', $params=NULL) { 
 /// Sets up global variables related to themes
 
-    global $CFG, $THEME, $SESSION, $USER, $HTTPSPAGEREQUIRED;
+    global $CFG, $THEME, $HTTPSPAGEREQUIRED;
 
 /// Do not mess with THEME if header already printed - this would break all the extra stuff in global $THEME from print_header()!!
     if (defined('HEADER_PRINTED')) {
@@ -2570,9 +2524,7 @@ function theme_setup($theme = '', $params=NULL) {
 
 /// Define stylesheet loading order
     $CFG->stylesheets = array();
-    if ($theme != 'standard') {    /// The standard sheet is always loaded first
-        $CFG->stylesheets[] = $CFG->themewww.'/mpstheme/styles.php'.$paramstring;
-    }
+
     if (!empty($THEME->parent)) {  /// Parent stylesheets are loaded next
         $CFG->stylesheets[] = $CFG->themewww.'/'.$THEME->parent.'/styles.php'.$paramstring;
     }
@@ -2665,279 +2617,6 @@ function user_login_string($course=NULL, $user=NULL) {
 
     return "<div class='logininfo'><a style='cursor: pointer;' onclick=\"confirmar_logout('Vols sortir de l`entorn ".$SITE->fullname."?','".sesskey()."');return false;\" href='".$CFG->wwwroot."/login/logout.php?sesskey=".sesskey()."'><img src='".$wwwroot."/theme/catdigital/pix/sortir.gif' style='border:none' alt='' /></a></div>";
 
-}
-
-/**
- * Tests whether $THEME->rarrow, $THEME->larrow have been set (theme/-/config.php).
- * If not it applies sensible defaults.
- *
- * Accessibility: right and left arrow Unicode characters for breadcrumb, calendar,
- * search forum block, etc. Important: these are 'silent' in a screen-reader
- * (unlike &gt; &raquo;), and must be accompanied by text.
- * @uses $THEME
- */
-function check_theme_arrows() {
-    global $THEME;
-
-    if (!isset($THEME->rarrow) and !isset($THEME->larrow)) {
-        // Default, looks good in Win XP/IE 6, Win/Firefox 1.5, Win/Netscape 8...
-        // Also OK in Win 9x/2K/IE 5.x
-        $THEME->rarrow = '&#x25BA;';
-        $THEME->larrow = '&#x25C4;';
-        if (empty($_SERVER['HTTP_USER_AGENT'])) {
-            $uagent = '';
-        } else {
-            $uagent = $_SERVER['HTTP_USER_AGENT'];
-        }
-        if (false !== strpos($uagent, 'Opera')
-            || false !== strpos($uagent, 'Mac')) {
-            // Looks good in Win XP/Mac/Opera 8/9, Mac/Firefox 2, Camino, Safari.
-            // Not broken in Mac/IE 5, Mac/Netscape 7 (?).
-            $THEME->rarrow = '&#x25B6;';
-            $THEME->larrow = '&#x25C0;';
-        }
-        elseif (false !== strpos($uagent, 'Konqueror')) {
-            $THEME->rarrow = '&rarr;';
-            $THEME->larrow = '&larr;';
-        }
-        elseif (isset($_SERVER['HTTP_ACCEPT_CHARSET'])
-            && false === stripos($_SERVER['HTTP_ACCEPT_CHARSET'], 'utf-8')) {
-            // (Win/IE 5 doesn't set ACCEPT_CHARSET, but handles Unicode.)
-            // To be safe, non-Unicode browsers!
-            $THEME->rarrow = '&gt;';
-            $THEME->larrow = '&lt;';
-        }
-
-    /// RTL support - in RTL languages, swap r and l arrows
-        if (right_to_left()) {
-            $t = $THEME->rarrow;
-            $THEME->rarrow = $THEME->larrow;
-            $THEME->larrow = $t;
-        }
-    }
-}
-
-/**
- * Return the right arrow with text ('next'), and optionally embedded in a link.
- * See function above, check_theme_arrows.
- * @param string $text HTML/plain text label (set to blank only for breadcrumb separator cases).
- * @param string $url An optional link to use in a surrounding HTML anchor.
- * @param bool $accesshide True if text should be hidden (for screen readers only).
- * @param string $addclass Additional class names for the link, or the arrow character.
- * @return string HTML string.
- */
-function link_arrow_right($text, $url='', $accesshide=false, $addclass='') {
-    global $THEME;
-    check_theme_arrows();
-    $arrowclass = 'arrow ';
-    if (! $url) {
-        $arrowclass .= $addclass;
-    }
-    $arrow = '<span class="'.$arrowclass.'">'.$THEME->rarrow.'</span>';
-    $htmltext = '';
-    if ($text) {
-        $htmltext = $text.'&nbsp;';
-        if ($accesshide) {
-            $htmltext = get_accesshide($htmltext);
-        }
-    }
-    if ($url) {
-        $class = '';
-        if ($addclass) {
-            $class =" class=\"$addclass\"";
-        }
-        return '<a'.$class.' href="'.$url.'" title="'.preg_replace('/<.*?>/','',$text).'">'.$htmltext.$arrow.'</a>';
-    }
-    return $htmltext.$arrow;
-}
-
-/**
- * Return a HTML element with the class "accesshide", for accessibility.
- *   Please use cautiously - where possible, text should be visible!
- * @param string $text Plain text.
- * @param string $elem Lowercase element name, default "span".
- * @param string $class Additional classes for the element.
- * @param string $attrs Additional attributes string in the form, "name='value' name2='value2'"
- * @return string HTML string.
- */
-function get_accesshide($text, $elem='span', $class='', $attrs='') {
-    return "<$elem class=\"accesshide $class\" $attrs>$text</$elem>";
-}
-
-/**
- * This function will build the navigation string to be used by print_header
- * and others.
- *
- * It automatically generates the site and course level (if appropriate) links.
- *
- * If you pass in a $cm object, the method will also generate the activity (e.g. 'Forums')
- * and activityinstances (e.g. 'General Developer Forum') navigation levels.
- *
- * If you want to add any further navigation links after the ones this function generates,
- * the pass an array of extra link arrays like this:
- * array(
- *     array('name' => $linktext1, 'link' => $url1, 'type' => $linktype1),
- *     array('name' => $linktext2, 'link' => $url2, 'type' => $linktype2)
- * )
- * The normal case is to just add one further link, for example 'Editing forum' after
- * 'General Developer Forum', with no link.
- * To do that, you need to pass
- * array(array('name' => $linktext, 'link' => '', 'type' => 'title'))
- * However, becuase this is a very common case, you can use a shortcut syntax, and just
- * pass the string 'Editing forum', instead of an array as $extranavlinks.
- *
- * At the moment, the link types only have limited significance. Type 'activity' is
- * recognised in order to implement the $CFG->hideactivitytypenavlink feature. Types
- * that are known to appear are 'home', 'course', 'activity', 'activityinstance' and 'title'.
- * This really needs to be documented better. In the mean time, try to be consistent, it will
- * enable people to customise the navigation more in future.
- *
- * When passing a $cm object, the fields used are $cm->modname, $cm->name and $cm->course.
- * If you get the $cm object using the function get_coursemodule_from_instance or
- * get_coursemodule_from_id (as recommended) then this will be done for you automatically.
- * If you don't have $cm->modname or $cm->name, this fuction will attempt to find them using
- * the $cm->module and $cm->instance fields, but this takes extra database queries, so a
- * warning is printed in developer debug mode.
- *
- * @uses $CFG
- * @uses $THEME
- *
- * @param mixed $extranavlinks - Normally an array of arrays, keys: name, link, type. If you
- *      only want one extra item with no link, you can pass a string instead. If you don't want
- *      any extra links, pass an empty string.
- * @param mixed $cm - optionally the $cm object, if you want this function to generate the
- *      activity and activityinstance levels of navigation too.
- *
- * @return $navigation as an object so it can be differentiated from old style
- *      navigation strings.
- */
-function build_navigation($extranavlinks, $cm = null) {
-    global $CFG, $COURSE;
-
-    if (is_string($extranavlinks)) {
-        if ($extranavlinks == '') {
-            $extranavlinks = array();
-        } else {
-            $extranavlinks = array(array('name' => $extranavlinks, 'link' => '', 'type' => 'title'));
-        }
-    }
-
-    $navlinks = array();
-
-// IECISA ********** DELETED -> take out becouse we never want to show the site name
-    //Site name
-    /*if ($site = get_site()) {
-        $navlinks[] = array(
-                'name' => format_string($site->shortname),
-                'link' => "$CFG->wwwroot/",
-                'type' => 'home');
-    }*/
-//********** END
-
-    // Course name, if appropriate.
-    if (isset($COURSE) && $COURSE->id != SITEID) {
-        $navlinks[] = array(
-                'name' => format_string($COURSE->shortname),
-                'link' => "$CFG->wwwroot/course/view.php?id=$COURSE->id",
-                'type' => 'course');
-    }
-
-    // Activity type and instance, if appropriate.
-    if (is_object($cm)) {
-        if (!isset($cm->modname)) {
-            debugging('The field $cm->modname should be set if you call build_navigation with '.
-                    'a $cm parameter. If you get $cm using get_coursemodule_from_instance or '.
-                    'get_coursemodule_from_id, this will be done automatically.', DEBUG_DEVELOPER);
-            if (!$cm->modname = get_field('modules', 'name', 'id', $cm->module)) {
-                error('Cannot get the module type in build navigation.');
-            }
-        }
-        if (!isset($cm->name)) {
-            debugging('The field $cm->name should be set if you call build_navigation with '.
-                    'a $cm parameter. If you get $cm using get_coursemodule_from_instance or '.
-                    'get_coursemodule_from_id, this will be done automatically.', DEBUG_DEVELOPER);
-            if (!$cm->name = get_field($cm->modname, 'name', 'id', $cm->instance)) {
-                error('Cannot get the module name in build navigation.');
-            }
-        }
-        $navlinks[] = array(
-                'name' => get_string('modulenameplural', $cm->modname),
-                'link' => $CFG->wwwroot . '/mod/' . $cm->modname . '/index.php?id=' . $cm->course,
-                'type' => 'activity');
-        $navlinks[] = array(
-                'name' => format_string($cm->name),
-                'link' => $CFG->wwwroot . '/mod/' . $cm->modname . '/view.php?id=' . $cm->id,
-                'type' => 'activityinstance');
-    }
-
-    //Merge in extra navigation links
-    $navlinks = array_merge($navlinks, $extranavlinks);
-
-    // Work out whether we should be showing the activity (e.g. Forums) link.
-    // Note: build_navigation() is called from many places --
-    // install & upgrade for example -- where we cannot count on the
-    // roles infrastructure to be defined. Hence the $CFG->rolesactive check.
-    if (!isset($CFG->hideactivitytypenavlink)) {
-        $CFG->hideactivitytypenavlink = 0;
-    }
-    if ($CFG->hideactivitytypenavlink == 2) {
-        $hideactivitylink = true;
-    } else if ($CFG->hideactivitytypenavlink == 1 && $CFG->rolesactive &&
-            !empty($COURSE->id) && $COURSE->id != SITEID) {
-        if (!isset($COURSE->context)) {
-            $COURSE->context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
-        }
-        $hideactivitylink = !has_capability('moodle/course:manageactivities', $COURSE->context);
-    } else {
-        $hideactivitylink = false;
-    }
-
-    //Construct an unordered list from $navlinks
-    //Accessibility: heading hidden from visual browsers by default.
-// IECISA ********** MODIFIED ->
-    //$navigation = get_accesshide(get_string('youarehere','access'), 'h2')." <ul class='menu_breadcrumb'>\n";
-    $navigation = get_accesshide(get_string('youarehere','access'), 'h2')." <ul class='menu_breadcrumb'>\n";
-//********** END
-    $lastindex = count($navlinks) - 1;
-    $i = -1; // Used to count the times, so we know when we get to the last item.
-    $first = true;
-// IECISA ********** ADDED -> show always "Inici"
-    $navigation .= "<li ><a href='".$CFG->wwwroot."/index.php'>Inici</a>&nbsp;<img src='".$CFG->wwwroot."/theme/catdigital/pix/r_breadcrumb.gif' style='width:0.9em;height:0.8em' alt='' />&nbsp;</li>";
-//********** END
-    foreach ($navlinks as $navlink) {
-        $i++;
-        $last = ($i == $lastindex);
-        if (!is_array($navlink)) {
-            continue;
-        }
-        if (!empty($navlink['type']) && $navlink['type'] == 'activity' && !$last && $hideactivitylink) {
-            continue;
-        }
-        if ($first) {
-            $navigation .= '<li class="first">';
-        } else {
-            $navigation .= '<li>';
-        }
-        if (!$first) {
-// IECISA ********** MODIFIED -> change standar separator 
-            //$navigation .= get_separator();
-            $navigation .= "<img src='".$CFG->wwwroot."/theme/catdigital/pix/r_breadcrumb.gif' style='width:0.9em;height:0.8em' alt='' />";
-//********** END
-        }
-        if ((!empty($navlink['link'])) && !$last) {
-            $navigation .= "<a $CFG->frametarget onclick=\"this.target='$CFG->framename'\" href=\"{$navlink['link']}\">";
-        }
-        $navigation .= "{$navlink['name']}";
-        if ((!empty($navlink['link'])) && !$last) {
-            $navigation .= "</a>";
-        }
-
-        $navigation .= "</li>";
-        $first = false;
-    }
-    $navigation .= "</ul>";
-
-    return(array('newnav' => true, 'navlinks' => $navigation));
 }
 
 /**
@@ -3607,46 +3286,6 @@ function print_editor_config($editorhidebuttons='', $return=false) {
 }
 
 /**
- * Returns a little popup menu for switching roles
- *
- * @uses $CFG
- * @uses $USER
- * @param int $courseid The course  to update by id as found in 'course' table
- * @return string
- */
-function switchroles_form($courseid) {
-
-    global $CFG, $USER;
-
-
-    if (!$context = get_context_instance(CONTEXT_COURSE, $courseid)) {
-        return '';
-    }
-
-    if (!empty($USER->access['rsw'][$context->path])){  // Just a button to return to normal
-        $options = array();
-        $options['id'] = $courseid;
-        $options['sesskey'] = sesskey();
-        $options['switchrole'] = 0;
-
-        return print_single_button($CFG->wwwroot.'/course/view.php', $options,
-                                   get_string('switchrolereturn'), 'post', '_self', true);
-    }
-
-    if (has_capability('moodle/role:switchroles', $context)) {
-        if (!$roles = get_assignable_roles_for_switchrole($context)) {
-            return '';   // Nothing to show!
-        }
-        // unset default user role - it would not work
-        unset($roles[$CFG->guestroleid]);
-        return popup_form($CFG->wwwroot.'/course/view.php?id='.$courseid.'&amp;sesskey='.sesskey().'&amp;switchrole=',
-                          $roles, 'switchrole', '', get_string('switchroleto'), 'switchrole', get_string('switchroleto'), true);
-    }
-
-    return '';
-}
-
-/**
  * Print an error page displaying an error message.  New method - use this for new code.
  *
  * @uses $SESSION
@@ -4144,21 +3783,6 @@ function page_id_and_class(&$getid, &$getclass) {
 
     $getid    = $id;
     $getclass = $class;
-}
-
-/**
- * Prints a maintenance message from /maintenance.html
- */
-function print_maintenance_message () {
-    global $CFG, $SITE;
-
-    $CFG->pagepath = "index.php";
-    print_header(strip_tags($SITE->fullname), $SITE->fullname, 'home');
-    print_box_start();
-    print_heading(get_string('sitemaintenance', 'admin'));
-    @include($CFG->dataroot.'/'.SITEID.'/maintenance.html');
-    print_box_end();
-    print_footer();
 }
 
 /**

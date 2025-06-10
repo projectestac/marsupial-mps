@@ -1,5 +1,4 @@
 <?php
-//BASED ON MOODLE 1.9.9. ARQUITECTURE
 
 /// check if the application is already installed
 if (!file_exists('../../../config.php')) {
@@ -28,27 +27,9 @@ if ($frm = data_submitted()) {
         $errormsg = get_string("errorloggin");
     } else {
         $USER = complete_user_login($user);
-        if (isset($SESSION->wantsurl) and (strpos($SESSION->wantsurl, $CFG->wwwroot) === 0)) {
-            $urltogo = $SESSION->wantsurl;    /// Because it's an address in this site
-            unset($SESSION->wantsurl);
-        } else {
-            // no wantsurl stored or external - go to homepage
-            $urltogo = $CFG->wwwroot . '/application/admin/';
-            unset($SESSION->wantsurl);
-        }
-        redirect($urltogo);
+        header ('Location:' . $CFG->wwwroot . '/application/admin/');
         exit;
     }
-}
-
-/// First, let's remember where the user was trying to get to before they got here
-if (empty($SESSION->wantsurl)) {
-    $SESSION->wantsurl = (array_key_exists('HTTP_REFERER', $_SERVER) &&
-        $_SERVER["HTTP_REFERER"] != $CFG->wwwroot &&
-        $_SERVER["HTTP_REFERER"] != $CFG->wwwroot . '/application/admin/' &&
-        $_SERVER["HTTP_REFERER"] != $CFG->httpswwwroot . '/application/admin/index.php' &&
-        $_SERVER["HTTP_REFERER"] != $CFG->httpswwwroot . '/application/admin/login.php')
-        ? $_SERVER["HTTP_REFERER"] : NULL;
 }
 
 print_header($CFG->sitename, $CFG->sitename);
@@ -83,5 +64,4 @@ echo '
     </div>';
 
 print_container_end();
-
 print_footer();

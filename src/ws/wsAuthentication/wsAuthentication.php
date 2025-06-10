@@ -321,7 +321,6 @@ function AutenticarUsuarioContenido($usrcontent) {
     return $result;
 }
 
-
 function UserAuthentication($post_data) {
     global $CFG;
 
@@ -362,7 +361,9 @@ function UserAuthentication($post_data) {
 
 generate_wsdl();
 
-ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
+ini_set('soap.wsdl_cache', WSDL_CACHE_DISK); // Use file-based cache
+ini_set('soap.wsdl_cache_ttl', 86400); // Cache lifetime (24 hours)
+ini_set('soap.wsdl_cache_dir', sys_get_temp_dir()); // Cache directory
 
 global $CFG;
 

@@ -750,21 +750,6 @@ function unset_config($name, $plugin=NULL) {
 }
 
 /**
- * Removes a single volatile flag
- *
- * @param string $type the "type" namespace for the key
- * @param string $name the key to set
- * @uses $CFG
- * @return bool
- */
-function unset_cache_flag($type, $name) {
-
-    return delete_records('cache_flags',
-                          'name', addslashes($name),
-                          'flagtype', addslashes($type));
-}
-
-/**
  * Refresh current $USER session global variable with all their current preferences.
  * @uses $USER
  */
@@ -785,73 +770,6 @@ function reload_user_preferences() {
     }
 
     return true;
-}
-
-/**
- * Sets a preference for the current user
- * Optionally, can set a preference for a different user object
- * @uses $USER
- * @todo Add a better description and include usage examples. Add inline links to $USER and user functions in above line.
-
- * @param string $name The key to set as preference for the specified user
- * @param string $value The value to set forthe $name key in the specified user's record
- * @param int $otheruserid A moodle user ID
- * @return bool
- */
-function set_user_preference($name, $value, $otheruserid=NULL) {
-
-    global $USER;
-
-    if (!isset($USER->preference)) {
-        reload_user_preferences();
-    }
-
-    if (empty($name)) {
-        return false;
-    }
-
-    $nostore = false;
-
-    if (empty($otheruserid)){
-        if (!isloggedin() or isguestuser()) {
-            $nostore = true;
-        }
-        $userid = $USER->id;
-    } else {
-        if (isguestuser($otheruserid)) {
-            $nostore = true;
-        }
-        $userid = $otheruserid;
-    }
-
-    $return = true;
-    if ($nostore) {
-        // no permanent storage for not-logged-in user and guest
-
-    } else if ($preference = get_record('user_preferences', 'userid', $userid, 'name', addslashes($name))) {
-        if ($preference->value === $value) {
-            return true;
-        }
-        if (!set_field('user_preferences', 'value', addslashes((string)$value), 'id', $preference->id)) {
-            $return = false;
-        }
-
-    } else {
-        $preference = new stdClass();
-        $preference->userid = $userid;
-        $preference->name   = addslashes($name);
-        $preference->value  = addslashes((string)$value);
-        if (!insert_record('user_preferences', $preference)) {
-            $return = false;
-        }
-    }
-
-    // update value in USER session if needed
-    if ($userid == $USER->id) {
-        $USER->preference[$name] = (string)$value;
-    }
-
-    return $return;
 }
 
 /**
@@ -1015,52 +933,6 @@ function userdate($date, $format='', $timezone=99, $fixday = true) {
    }
 
     return $datestring;
-}
-
-/**
- * Given a $time timestamp in GMT (seconds since epoch),
- * returns an array that represents the date in user time
- *
- * @uses HOURSECS
- * @param int $time Timestamp in GMT
- * @param float $timezone ?
- * @return array An array that represents the date in user time
- * @todo Finish documenting this function
- */
-function usergetdate($time, $timezone=99) {
-
-    $strtimezone = NULL;
-    if (!is_numeric($timezone)) {
-        $strtimezone = $timezone;
-    }
-
-    $timezone = get_user_timezone_offset($timezone);
-
-    if (abs($timezone) > 13) {    // Server time
-        return getdate($time);
-    }
-
-    // There is no gmgetdate so we use gmdate instead
-    $time += dst_offset_on($time, $strtimezone);
-    $time += intval((float)$timezone * HOURSECS);
-
-    $datestring = gmstrftime('%B_%A_%j_%Y_%m_%w_%d_%H_%M_%S', $time);
-
-    //be careful to ensure the returned array matches that produced by getdate() above
-    list(
-        $getdate['month'],
-        $getdate['weekday'],
-        $getdate['yday'],
-        $getdate['year'],
-        $getdate['mon'],
-        $getdate['wday'],
-        $getdate['mday'],
-        $getdate['hours'],
-        $getdate['minutes'],
-        $getdate['seconds']
-    ) = explode('_', $datestring);
-
-    return $getdate;
 }
 
 /**
@@ -1478,40 +1350,6 @@ function confirm_sesskey($sesskey=NULL) {
 }
 
 /**
- * Setup all global $CFG course variables, set locale and also themes
- * This function can be used on pages that do not require login instead of require_login()
- *
- * @param mixed $courseorid id of the course or course object
- */
-function course_setup($courseorid=0) {
-    global $COURSE, $CFG, $SITE;
-
-/// Redefine global $COURSE if needed
-    if (empty($courseorid)) {
-        // no change in global $COURSE - for backwards compatibiltiy
-        // if require_rogin() used after require_login($courseid);
-    } else if (is_object($courseorid)) {
-        $COURSE = clone($courseorid);
-    } else {
-        global $course; // used here only to prevent repeated fetching from DB - may be removed later
-        if ($courseorid == SITEID) {
-            $COURSE = clone($SITE);
-        } else if (!empty($course->id) and $course->id == $courseorid) {
-            $COURSE = clone($course);
-        } else {
-            if (!$COURSE = get_record('course', 'id', $courseorid)) {
-                error('Invalid course ID');
-            }
-        }
-    }
-
-/// set locale and themes
-    moodle_setlocale();
-    theme_setup();
-
-}
-
-/**
  * This function just makes sure a user is logged out.
  *
  * @uses $CFG
@@ -1628,128 +1466,6 @@ function set_send_count($user,$reset=false) {
         $pref->userid = $user->id;
         insert_record('user_preferences',$pref, false);
     }
-}
-
-/**
- * Goes through all enrolment records for the courses inside the metacourse and sync with them.
- *
- * @param mixed $course the metacourse to synch. Either the course object itself, or the courseid.
- */
-function sync_metacourse($course) {
-    global $CFG;
-
-    // Check the course is valid.
-    if (!is_object($course)) {
-        if (!$course = get_record('course', 'id', $course)) {
-            return false; // invalid course id
-        }
-    }
-
-    // Check that we actually have a metacourse.
-    if (empty($course->metacourse)) {
-        return false;
-    }
-
-    // Get a list of roles that should not be synced.
-    if (!empty($CFG->nonmetacoursesyncroleids)) {
-        $roleexclusions = 'ra.roleid NOT IN (' . $CFG->nonmetacoursesyncroleids . ') AND';
-    } else {
-        $roleexclusions = '';
-    }
-
-    // Get the context of the metacourse.
-    $context = get_context_instance(CONTEXT_COURSE, $course->id); // SITEID can not be a metacourse
-
-    // We do not ever want to unassign the list of metacourse manager, so get a list of them.
-    if ($users = get_users_by_capability($context, 'moodle/course:managemetacourse')) {
-        $managers = array_keys($users);
-    } else {
-        $managers = array();
-    }
-
-    // Get assignments of a user to a role that exist in a child course, but
-    // not in the meta coure. That is, get a list of the assignments that need to be made.
-    if (!$assignments = get_records_sql("
-            SELECT
-                ra.id, ra.roleid, ra.userid, ra.hidden
-            FROM
-                {$CFG->prefix}role_assignments ra,
-                {$CFG->prefix}context con,
-                {$CFG->prefix}course_meta cm
-            WHERE
-                ra.contextid = con.id AND
-                con.contextlevel = " . CONTEXT_COURSE . " AND
-                con.instanceid = cm.child_course AND
-                cm.parent_course = {$course->id} AND
-                $roleexclusions
-                NOT EXISTS (
-                    SELECT 1 FROM
-                        {$CFG->prefix}role_assignments ra2
-                    WHERE
-                        ra2.userid = ra.userid AND
-                        ra2.roleid = ra.roleid AND
-                        ra2.contextid = {$context->id}
-                )
-    ")) {
-        $assignments = array();
-    }
-
-    // Get assignments of a user to a role that exist in the meta course, but
-    // not in any child courses. That is, get a list of the unassignments that need to be made.
-    if (!$unassignments = get_records_sql("
-            SELECT
-                ra.id, ra.roleid, ra.userid
-            FROM
-                {$CFG->prefix}role_assignments ra
-            WHERE
-                ra.contextid = {$context->id} AND
-                $roleexclusions
-                NOT EXISTS (
-                    SELECT 1 FROM
-                        {$CFG->prefix}role_assignments ra2,
-                        {$CFG->prefix}context con2,
-                        {$CFG->prefix}course_meta cm
-                    WHERE
-                        ra2.userid = ra.userid AND
-                        ra2.roleid = ra.roleid AND
-                        ra2.contextid = con2.id AND
-                        con2.contextlevel = " . CONTEXT_COURSE . " AND
-                        con2.instanceid = cm.child_course AND
-                        cm.parent_course = {$course->id}
-                )
-    ")) {
-        $unassignments = array();
-    }
-
-    $success = true;
-
-    // Make the unassignments, if they are not managers.
-    foreach ($unassignments as $unassignment) {
-        if (!in_array($unassignment->userid, $managers)) {
-            $success = role_unassign($unassignment->roleid, $unassignment->userid, 0, $context->id) && $success;
-        }
-    }
-
-    // Make the assignments.
-    foreach ($assignments as $assignment) {
-        $success = role_assign($assignment->roleid, $assignment->userid, 0, $context->id, 0, 0, $assignment->hidden) && $success;
-    }
-
-    return $success;
-
-// TODO: finish timeend and timestart
-// maybe we could rely on cron job to do the cleaning from time to time
-}
-
-/**
- * Removes the record from the metacourse table and calls sync_metacourse
- */
-function remove_from_metacourse($metacourseid, $courseid) {
-
-    if (delete_records('course_meta','parent_course',$metacourseid,'child_course',$courseid)) {
-        return sync_metacourse($metacourseid);
-    }
-    return false;
 }
 
 /**
@@ -2796,7 +2512,6 @@ function clean_filename($string) {
     return $string;
 }
 
-
 /// STRING TRANSLATION  ////////////////////////////////////////
 
 /**
@@ -3552,7 +3267,7 @@ function check_php_version($version='4.1.0') {
  * @param string $brand The operating system identifier being tested
  * @return bool true if the given brand below to the detected operating system
  */
- function check_browser_operating_system($brand) {
+function check_browser_operating_system($brand) {
     if (empty($_SERVER['HTTP_USER_AGENT'])) {
         return false;
     }
@@ -4082,6 +3797,7 @@ function unzip_show_status($list, $removepath, $removepath2) {
  */
 define('GETREMOTEADDR_SKIP_HTTP_CLIENT_IP', '1');
 define('GETREMOTEADDR_SKIP_HTTP_X_FORWARDED_FOR', '2');
+
 function getremoteaddr() {
     global $CFG;
 

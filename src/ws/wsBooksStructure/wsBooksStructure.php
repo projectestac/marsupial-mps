@@ -465,8 +465,6 @@ function UserAuthentication($post_data) {
 
 generate_wsdl();
 
-ini_set('soap.wsdl_cache_enabled', '0'); // disabling WSDL cache
-
 $server = new SoapServer($CFG->dataroot . '/1/WebServices/wsBooksStructure/wsBooksStructure.wsdl', ['soap_version' => SOAP_1_1]);
 
 $server->addFunction('ObtenerTodos');

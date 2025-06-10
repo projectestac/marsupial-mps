@@ -3,6 +3,10 @@ Release notes for SIMULADOR EDITORIAL MARSUPIAL (http://mps.xtec.cat)
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/marsupial-mps
 
+Changes 25.06.10
+---------------------------------------------------------------------------------------
+- General update of the code for compatibility with PHP 8.4
+
 Changes 15.11.21
 ---------------------------------------------------------------------------------------
  - Removed call to window.parent.enableButtons that causes a security exception on JS

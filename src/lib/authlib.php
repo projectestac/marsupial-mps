@@ -1,4 +1,5 @@
-<?php  // $Id: authlib.php,v 1.8.2.8 2009/11/23 21:53:48 skodak Exp $
+<?php
+// $Id: authlib.php,v 1.8.2.8 2009/11/23 21:53:48 skodak Exp $
 /**
  * @author Martin Dougiamas
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
@@ -13,12 +14,12 @@
 /**
  * Returned when the login was successful.
  */
-define('AUTH_OK',     0);
+define('AUTH_OK', 0);
 
 /**
  * Returned when the login was unsuccessful.
  */
-define('AUTH_FAIL',   1);
+define('AUTH_FAIL', 1);
 
 /**
  * Returned when the login was denied (a reason for AUTH_FAIL).
@@ -28,7 +29,7 @@ define('AUTH_DENIED', 2);
 /**
  * Returned when some error occurred (a reason for AUTH_FAIL).
  */
-define('AUTH_ERROR',  4);
+define('AUTH_ERROR', 4);
 
 /**
  * Authentication - error codes for user confirm
@@ -74,11 +75,10 @@ class auth_plugin_base {
         'department',
         'phone1',
         'phone2',
-        'address'
+        'address',
     );
 
     /**
-
      * This is the primary method that is used by the authenticate_user_login()
      * function in moodlelib.php. This method should return a boolean indicating
      * whether or not the username and password authenticate successfully.
@@ -132,6 +132,7 @@ class auth_plugin_base {
 
     /**
      * Indicates if password hashes should be stored in local moodle database.
+     *
      * @return bool true means md5 password hash stored in user table, false means flag 'not_cached' stored there instead
      */
     function prevent_local_passwords() {
@@ -144,8 +145,8 @@ class auth_plugin_base {
      * auth_user_update_password accepted a username as the first parameter. The
      * revised function expects a user object.
      *
-     * @param  object  $user        User table object  (with system magic quotes)
-     * @param  string  $newpassword Plaintext password (with system magic quotes)
+     * @param object $user User table object  (with system magic quotes)
+     * @param string $newpassword Plaintext password (with system magic quotes)
      *
      * @return bool                  True on success
      */
@@ -159,8 +160,8 @@ class auth_plugin_base {
      * Modifies user in external database. It takes olduser (before changes) and newuser (after changes)
      * conpares information saved modified information to external db.
      *
-     * @param mixed $olduser     Userobject before modifications    (without system magic quotes)
-     * @param mixed $newuser     Userobject new modified userobject (without system magic quotes)
+     * @param mixed $olduser Userobject before modifications    (without system magic quotes)
+     * @param mixed $newuser Userobject new modified userobject (without system magic quotes)
      * @return boolean true if updated or update ignored; false if error
      *
      */
@@ -172,7 +173,8 @@ class auth_plugin_base {
     /**
      * User delete requested - internal user record is mared as deleted already, username not present anymore.
      * Do any action in external database.
-     * @param object $user       Userobject before delete    (without system magic quotes)
+     *
+     * @param object $user Userobject before delete    (without system magic quotes)
      */
     function user_delete($olduser) {
         //override if needed
@@ -206,7 +208,7 @@ class auth_plugin_base {
      * @param object $user new user object (with system magic quotes)
      * @param boolean $notify print notice with link and terminate
      */
-    function user_signup($user, $notify=true) {
+    function user_signup($user, $notify = true) {
         //override when can signup
         error('user_signup method must be overriden if signup enabled');
     }
@@ -255,6 +257,7 @@ class auth_plugin_base {
     function password_expire($username) {
         return 0;
     }
+
     /**
      * Sync roles for this user - usually creator
      *
@@ -291,10 +294,11 @@ class auth_plugin_base {
     /**
      * A chance to validate form data, and last chance to
      * do stuff before it is inserted in config_plugin
+     *
      * @param object object with submitted configuration settings (without system magic quotes)
      * @param array $err array of error messages
      */
-     function validate_form(&$form, &$err) {
+    function validate_form(&$form, &$err) {
         //override if needed
     }
 
@@ -369,9 +373,10 @@ class auth_plugin_base {
         }
         return $authdescription;
     }
-    
+
     /**
      * Returns whether or not the captcha element is enabled, and the admin settings fulfil its requirements.
+     *
      * @abstract Implement in child classes
      * @return bool
      */
