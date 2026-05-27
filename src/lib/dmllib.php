@@ -1,41 +1,5 @@
-<?php // $Id: dmllib.php,v 1.116.2.34 2010/01/07 15:02:41 stronk7 Exp $
-
-///////////////////////////////////////////////////////////////////////////
-//                                                                       //
-// NOTICE OF COPYRIGHT                                                   //
-//                                                                       //
-// Moodle - Modular Object-Oriented Dynamic Learning Environment         //
-//          http://moodle.com                                            //
-//                                                                       //
-// Copyright (C) 1999 onwards Martin Dougiamas     http://dougiamas.com  //
-//                                                                       //
-// This program is free software; you can redistribute it and/or modify  //
-// it under the terms of the GNU General Public License as published by  //
-// the Free Software Foundation; either version 2 of the License, or     //
-// (at your option) any later version.                                   //
-//                                                                       //
-// This program is distributed in the hope that it will be useful,       //
-// but WITHOUT ANY WARRANTY; without even the implied warranty of        //
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         //
-// GNU General Public License for more details:                          //
-//                                                                       //
-//          http://www.gnu.org/copyleft/gpl.html                         //
-//                                                                       //
-///////////////////////////////////////////////////////////////////////////
-
-/// This library contains all the Data Manipulation Language (DML) functions
-/// used to interact with the DB. All the dunctions in this library must be
-/// generic and work against the major number of RDBMS possible. This is the
-/// list of currently supported and tested DBs: mysql, postresql, mssql, oracle
-
-/// This library is automatically included by Moodle core so you never need to
-/// include it yourself.
-
-/// For more info about the functions available in this library, please visit:
-///     http://docs.moodle.org/en/DML_functions
-/// (feel free to modify, improve and document such page, thanks!)
-
-/// GLOBAL CONSTANTS /////////////////////////////////////////////////////////
+<?php
+/// GLOBAL CONSTANTS
 
 $empty_rs_cache = array();   // Keeps copies of the recordsets used in one invocation
 $metadata_cache = array();   // Kereeps copies of the MetaColumns() for each table used in one invocations
@@ -45,7 +9,7 @@ $rcache->data   = array();
 $rcache->hits   = 0;
 $rcache->misses = 0;
 
-/// FUNCTIONS FOR DATABASE HANDLING  ////////////////////////////////
+/// FUNCTIONS FOR DATABASE HANDLING
 
 /**
  * Execute a given sql command string
@@ -161,23 +125,6 @@ function rollback_sql() {
 }
 
 /**
- * returns db specific uppercase function
- * @deprecated Moodle 1.7 because all the RDBMS use upper()
- */
-function db_uppercase() {
-    return "upper";
-}
-
-/**
- * returns db specific lowercase function
- * @deprecated Moodle 1.7 because all the RDBMS use lower()
- */
-function db_lowercase() {
-    return "lower";
-}
-
-
-/**
  * Run an arbitrary sequence of semicolon-delimited SQL commands
  *
  * Assumes that the input text (file or string) consists of
@@ -246,7 +193,7 @@ function modify_database($sqlfile='', $sqlstring='') {
 
 }
 
-/// GENERIC FUNCTIONS TO CHECK AND COUNT RECORDS ////////////////////////////////////////
+/// GENERIC FUNCTIONS TO CHECK AND COUNT RECORDS
 
 /**
  * Test whether a record exists in a table where all the given fields match the given values.
@@ -271,25 +218,6 @@ function record_exists($table, $field1='', $value1='', $field2='', $value2='', $
     $select = where_clause($field1, $value1, $field2, $value2, $field3, $value3);
 
     return record_exists_sql('SELECT * FROM '. $CFG->prefix . $table .' '. $select);
-}
-
-/**
- * Test whether any records exists in a table which match a particular WHERE clause.
- *
- * @uses $CFG
- * @param string $table The database table to be checked against.
- * @param string $select A fragment of SQL to be used in a WHERE clause in the SQL call.
- * @return bool true if a matching record exists, else false.
- */
-function record_exists_select($table, $select='') {
-
-    global $CFG;
-
-    if ($select) {
-        $select = 'WHERE '.$select;
-    }
-
-    return record_exists_sql('SELECT * FROM '. $CFG->prefix . $table . ' ' . $select);
 }
 
 /**
@@ -385,8 +313,7 @@ function count_records_sql($sql) {
     }
 }
 
-/// GENERIC FUNCTIONS TO GET, INSERT, OR UPDATE DATA  ///////////////////////////////////
-
+/// GENERIC FUNCTIONS TO GET, INSERT, OR UPDATE DATA
 
 /**
  * Get a single record as an object
@@ -610,35 +537,6 @@ function get_recordset_select($table, $select='', $sort='', $fields='*', $limitf
 }
 
 /**
- * Get a number of records as an ADODB RecordSet.
- *
- * Only records where $field takes one of the values $values are returned.
- * $values should be a comma-separated list of values, for example "4,5,6,10"
- * or "'foo','bar','baz'".
- *
- * Other arguments and the return type as for @see function get_recordset.
- *
- * @param string $table the table to query.
- * @param string $field a field to check (optional).
- * @param string $values comma separated list of values the field must have (requred if field is given, else optional).
- * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
- * @param string $fields a comma separated list of fields to return (optional, by default all fields are returned).
- * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
- * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
- * @return mixed an ADODB RecordSet object, or false if an error occured.
- */
-function get_recordset_list($table, $field='', $values='', $sort='', $fields='*', $limitfrom='', $limitnum='') {
-
-    if ($field) {
-        $select = "$field IN ($values)";
-    } else {
-        $select = '';
-    }
-
-    return get_recordset_select($table, $select, $sort, $fields, $limitfrom, $limitnum);
-}
-
-/**
  * Get a number of records as an ADODB RecordSet.  $sql must be a complete SQL query.
  * Since this method is a little less readable, use of it should be restricted to 
  * code where it's possible there might be large datasets being returned.  For known 
@@ -753,55 +651,6 @@ function recordset_to_array($rs) {
 
 /**
  * This function is used to get the current record from the recordset. It
- * doesn't advance the recordset position. You'll need to do that by
- * using the rs_next_record($recordset) function.
- * @param ADORecordSet the recordset to fetch current record from
- * @return ADOFetchObj the object containing the fetched information
- */
-function rs_fetch_record(&$rs) {
-    global $CFG;
-
-    if (!$rs) {
-        debugging('Incorrect $rs used!', DEBUG_DEVELOPER);
-        return false;
-    }
-
-    $rec = $rs->FetchObj(); //Retrieve record as object without advance the pointer
-
-    if ($rs->EOF) { //FetchObj requires manual checking of EOF to detect if it's the last record
-        $rec = false;
-    } else {
-    /// DIRTY HACK to retrieve all the ' ' (1 space) fields converted back
-    /// to '' (empty string) for Oracle. It's the only way to work with
-    /// all those NOT NULL DEFAULT '' fields until we definetively delete them
-        if ($CFG->dbfamily == 'oracle') {
-            $recarr = (array)$rec; /// Cast to array
-            array_walk($recarr, 'onespace2empty');
-            $rec = (object)$recarr;/// Cast back to object
-        }
-    /// End DIRTY HACK
-    }
-
-    return $rec;
-}
-
-/**
- * This function is used to advance the pointer of the recordset
- * to its next position/record.
- * @param ADORecordSet the recordset to be moved to the next record
- * @return boolean true if the movement was successful and false if not (end of recordset)
- */
-function rs_next_record(&$rs) {
-    if (!$rs) {
-        debugging('Incorrect $rs used!', DEBUG_DEVELOPER);
-        return false;
-    }
-
-    return $rs->MoveNext(); //Move the pointer to the next record
-}
-
-/**
- * This function is used to get the current record from the recordset. It
  * does advance the recordset position.
  * This is the prefered way to iterate over recordsets with code blocks like this:
  *
@@ -883,8 +732,6 @@ function onespace2empty(&$item, $key=null) {
     $item = $item == ' ' ? '' : $item;
     return true;
 }
-///End DIRTY HACK
-
 
 /**
  * Get a number of records as an array of objects.
@@ -936,25 +783,6 @@ function get_records_select($table, $select='', $sort='', $fields='*', $limitfro
  *
  * Return value as for @see function get_records.
  *
- * @param string $table The database table to be checked against.
- * @param string $field The field to search
- * @param string $values Comma separated list of possible value
- * @param string $sort Sort order (as valid SQL sort parameter)
- * @param string $fields A comma separated list of fields to be returned from the chosen table. If specified,
- *   the first field should be a unique one such as 'id' since it will be used as a key in the associative
- *   array.
- * @return mixed an array of objects, or false if no records were found or an error occured.
- */
-function get_records_list($table, $field='', $values='', $sort='', $fields='*', $limitfrom='', $limitnum='') {
-    $rs = get_recordset_list($table, $field, $values, $sort, $fields, $limitfrom, $limitnum);
-    return recordset_to_array($rs);
-}
-
-/**
- * Get a number of records as an array of objects.
- *
- * Return value as for @see function get_records.
- *
  * @param string $sql the SQL select query to execute. The first column of this SELECT statement
  *   must be a unique value (usually the 'id' field), as it will be used as the key of the
  *   returned array.
@@ -997,30 +825,6 @@ function recordset_to_menu($rs) {
 }
 
 /**
- * Utility function 
- * Similar to recordset_to_menu 
- *
- * field1, field2 is needed because the order from get_records_sql is not reliable
- * @param records - records from get_records_sql() or get_records()
- * @param field1 - field to be used as menu index
- * @param field2 - feild to be used as coresponding menu value
- * @return mixed an associative array, or false if an error occured or the RecordSet was empty.
- */
-function records_to_menu($records, $field1, $field2) {
-
-    $menu = array();
-    foreach ($records as $record) {
-        $menu[$record->$field1] = $record->$field2;
-    }
-
-    if (!empty($menu)) {
-        return $menu;
-    } else {
-        return false; 
-    }
-}
-
-/**
  * Get the first two columns from a number of records as an associative array.
  *
  * Arguments as for @see function get_recordset.
@@ -1041,25 +845,6 @@ function records_to_menu($records, $field1, $field2) {
  */
 function get_records_menu($table, $field='', $value='', $sort='', $fields='*', $limitfrom='', $limitnum='') {
     $rs = get_recordset($table, $field, $value, $sort, $fields, $limitfrom, $limitnum);
-    return recordset_to_menu($rs);
-}
-
-/**
- * Get the first two columns from a number of records as an associative array.
- *
- * Arguments as for @see function get_recordset_select.
- * Return value as for @see function get_records_menu.
- *
- * @param string $table The database table to be checked against.
- * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
- * @param string $sort Sort order (optional) - a valid SQL order parameter
- * @param string $fields A comma separated list of fields to be returned from the chosen table.
- * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
- * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
- * @return mixed an associative array, or false if no records were found or an error occured.
- */
-function get_records_select_menu($table, $select='', $sort='', $fields='*', $limitfrom='', $limitnum='') {
-    $rs = get_recordset_select($table, $select, $sort, $fields, $limitfrom, $limitnum);
     return recordset_to_menu($rs);
 }
 
@@ -1099,23 +884,6 @@ function get_field($table, $return, $field1, $value1, $field2='', $value2='', $f
 }
 
 /**
- * Get a single value from a table row where a particular select clause is true.
- *
- * @uses $CFG
- * @param string $table the table to query.
- * @param string $return the field to return the value of.
- * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
- * @return mixed the specified value, or false if an error occured.
- */
-function get_field_select($table, $return, $select) {
-    global $CFG;
-    if ($select) {
-        $select = 'WHERE '. $select;
-    }
-    return get_field_sql('SELECT ' . $return . ' FROM ' . $CFG->prefix . $table . ' ' . $select);
-}
-
-/**
  * Get a single value from a table.
  *
  * @param string $sql an SQL statement expected to return a single value.
@@ -1145,72 +913,6 @@ function get_field_sql($sql) {
         /// End of DIRTY HACK
         return reset($rs->fields);
     } else {
-        return false;
-    }
-}
-
-/**
- * Get a single value from a table row where a particular select clause is true.
- *
- * @uses $CFG
- * @param string $table the table to query.
- * @param string $return the field to return the value of.
- * @param string $select A fragment of SQL to be used in a where clause in the SQL call.
- * @return mixed|false Returns the value return from the SQL statment or false if an error occured.
- */
-function get_fieldset_select($table, $return, $select) {
-    global $CFG;
-    if ($select) {
-        $select = ' WHERE '. $select;
-    }
-    return get_fieldset_sql('SELECT ' . $return . ' FROM ' . $CFG->prefix . $table . $select);
-}
-
-/**
- * Get an array of data from one or more fields from a database
- * use to get a column, or a series of distinct values
- *
- * @uses $CFG
- * @uses $db
- * @param string $sql The SQL string you wish to be executed.
- * @return mixed|false Returns the value return from the SQL statment or false if an error occured.
- * @todo Finish documenting this function
- */
-function get_fieldset_sql($sql) {
-
-    global $db, $CFG;
-
-    if (defined('MDL_PERFDB')) { global $PERF ; $PERF->dbqueries++; };
-
-    $rs = $db->Execute($sql);
-    if (!$rs) {
-        debugging($db->ErrorMsg() .'<br /><br />'. s($sql));
-        if (!empty($CFG->dblogerror)) {
-            $debug=array_shift(debug_backtrace());
-            error_log("SQL ".$db->ErrorMsg()." in {$debug['file']} on line {$debug['line']}. STATEMENT:  $sql");
-        }
-        return false;
-    }
-
-    if ( !rs_EOF($rs) ) {
-        $keys = array_keys($rs->fields);
-        $key0 = $keys[0];
-        $results = array();
-        while (!$rs->EOF) {
-            array_push($results, $rs->fields[$key0]);
-            $rs->MoveNext();
-        }
-        /// DIRTY HACK to retrieve all the ' ' (1 space) fields converted back
-        /// to '' (empty string) for Oracle. It's the only way to work with
-        /// all those NOT NULL DEFAULT '' fields until we definetively delete them
-        if ($CFG->dbfamily == 'oracle') {
-            array_walk($results, 'onespace2empty');
-        }
-        /// End of DIRTY HACK
-        rs_close($rs);
-        return $results;
-    } else {
-        rs_close($rs);
         return false;
     }
 }
@@ -1725,31 +1427,6 @@ function update_record($table, $dataobject) {
     return true;
 }
 
-
-
-/**
- * Returns the proper SQL to do paging
- *
- * @uses $CFG
- * @param string $page Offset page number
- * @param string $recordsperpage Number of records per page
- * @deprecated Moodle 1.7 use the new $limitfrom, $limitnum available in all
- *             the get_recordXXX() funcions.
- * @return string
- */
-function sql_paging_limit($page, $recordsperpage) {
-    global $CFG;
-
-    debugging('Function sql_paging_limit() is deprecated. Replace it with the correct use of limitfrom, limitnum parameters', DEBUG_DEVELOPER);
-
-    switch ($CFG->dbfamily) {
-        case 'postgres':
-             return 'LIMIT '. $recordsperpage .' OFFSET '. $page;
-        default:
-             return 'LIMIT '. $page .','. $recordsperpage;
-    }
-}
-
 /**
  * Returns the proper SQL to do LIKE in a case-insensitive way
  *
@@ -1768,23 +1445,6 @@ function sql_ilike() {
              return 'ILIKE';
         default:
              return 'LIKE';
-    }
-}
-
-
-/**
- * Returns the proper SQL to do MAX
- *
- * @uses $CFG
- * @param string $field
- * @return string
- */
-function sql_max($field) {
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        default:
-             return "MAX($field)";
     }
 }
 
@@ -1818,31 +1478,6 @@ function sql_concat() {
         array_unshift($args , "''");
     }
     return call_user_func_array(array($db, 'Concat'), $args);
-}
-
-/**
- * Returns the proper SQL to do CONCAT between the elements passed
- * with a given separator
- *
- * @uses $db
- * @param string $separator
- * @param array  $elements
- * @return string
- */
-function sql_concat_join($separator="' '", $elements=array()) {
-    global $db;
-
-    // copy to ensure pass by value
-    $elem = $elements;
-
-    // Intersperse $elements in the array.
-    // Add items to the array on the fly, walking it
-    // _backwards_ splicing the elements in. The loop definition
-    // should skip first and last positions.
-    for ($n=count($elem)-1; $n > 0 ; $n--) {
-        array_splice($elem, $n, 0, $separator);
-    }
-    return call_user_func_array(array($db, 'Concat'), $elem);
 }
 
 /**
@@ -1905,59 +1540,6 @@ function sql_isempty($tablename, $fieldname, $nullablefield, $textfield) {
 }
 
 /**
- * Returns the proper SQL to know if one field is not empty.
- *
- * Note that the function behavior strongly relies on the
- * parameters passed describing the field so, please,  be accurate
- * when speciffying them.
- *
- * This function should be applied in all the places where conditions of
- * the type:
- *
- *     ... AND fieldname != '';
- *
- * are being used. Final result should be:
- *
- *     ... AND ' . sql_isnotempty('tablename', 'fieldname', true/false, true/false);
- *
- * (see parameters description below)
- *
- * @param string $tablename name of the table (without prefix). Not used for now but can be
- *                          necessary in the future if we want to use some introspection using
- *                          meta information against the DB. /// TODO ///
- * @param string $fieldname name of the field we are going to check
- * @param boolean $nullablefield to specify if the field us nullable (true) or no (false) in the DB
- * @param boolean $textfield to specify if it is a text (also called clob) field (true) or a varchar one (false)
- * @return string the sql code to be added to check for non empty values
- */
-function sql_isnotempty($tablename, $fieldname, $nullablefield, $textfield) {
-
-    return ' ( NOT ' . sql_isempty($tablename, $fieldname, $nullablefield, $textfield) . ') ';
-}
-
-/**
- * Returns the proper AS keyword to be used to aliase columns
- * SQL defines the keyword as optional and nobody but PG
- * seems to require it. This function should be used inside all
- * the statements using column aliases.
- * Note than the use of table aliases doesn't require the
- * AS keyword at all, only columns for postgres.
- * @uses $CFG
- * @ return string the keyword
- * @deprecated Moodle 1.7 because coding guidelines now enforce to use AS in column aliases
- */
-function sql_as() {
-    global $CFG, $db;
-
-    switch ($CFG->dbfamily) {
-        case 'postgres':
-            return 'AS';
-        default:
-            return '';
-    }
-}
-
-/**
  * Returns the empty string char used by every supported DB. To be used when
  * we are searching for that values in our queries. Only Oracle uses this
  * for now (will be out, once we migrate to proper NULLs if that days arrives)
@@ -1974,17 +1556,6 @@ function sql_empty() {
 }
 
 /**
- * Returns the proper substr() function for each DB
- * Relies on ADOdb $db->substr property
- */
-function sql_substr() {
-
-    global $db;
-
-    return $db->substr;
-}
-
-/**
  * Returns the SQL text to be used to compare one TEXT (clob) column with
  * one varchar column, because some RDBMS doesn't support such direct
  * comparisons.
@@ -1995,7 +1566,6 @@ function sql_substr() {
 function sql_compare_text($fieldname, $numchars=32) {
     return sql_order_by_text($fieldname, $numchars);
 }
-
 
 /**
  * Returns the SQL text to be used to order by one TEXT (clob) column, because
@@ -2019,207 +1589,6 @@ function sql_order_by_text($fieldname, $numchars=32) {
             break;
         default:
             return $fieldname;
-    }
-}
-
-/**
- * Returns the SQL text to be used to calculate the length in characters of one expression.
- * @param string fieldname or expression to calculate its length in characters.
- * @return string the piece of SQL code to be used in the statement.
- */
-function sql_length($fieldname) {
-
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'mysql':
-            return 'CHAR_LENGTH(' . $fieldname . ')';
-            break;
-        case 'mssql':
-            return 'LEN(' . $fieldname . ')';
-            break;
-        default:
-            return 'LENGTH(' . $fieldname . ')';
-    }
-}
-
-    /**
-     * Returns the SQL for returning searching one string for the location of another.
-     * @param string $needle the SQL expression that will be searched for.
-     * @param string $haystack the SQL expression that will be searched in.
-     * @return string the required SQL
-     */
-function sql_position($needle, $haystack) {
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'mssql':
-            return "CHARINDEX(($needle), ($haystack))";
-            break;
-        case 'oracle':
-            return "INSTR(($haystack), ($needle))";
-            break;
-        default:
-            return "POSITION(($needle) IN ($haystack))";
-    }
-}
-
-/**
- * Returns the SQL to be used in order to CAST one CHAR column to INTEGER.
- *
- * Be aware that the CHAR column you're trying to cast contains really
- * int values or the RDBMS will throw an error!
- *
- * @param string fieldname the name of the field to be casted
- * @param boolean text to specify if the original column is one TEXT (CLOB) column (true). Defaults to false.
- * @return string the piece of SQL code to be used in your statement.
- */
-function sql_cast_char2int($fieldname, $text=false) {
-
-    global $CFG;
-
-    $sql = '';
-
-    switch ($CFG->dbfamily) {
-        case 'mysql':
-            $sql = ' CAST(' . $fieldname . ' AS SIGNED) ';
-            break;
-        case 'postgres':
-            $sql = ' CAST(' . $fieldname . ' AS INT) ';
-            break;
-        case 'mssql':
-            if (!$text) {
-                $sql = ' CAST(' . $fieldname . ' AS INT) ';
-            } else {
-                $sql = ' CAST(' . sql_compare_text($fieldname) . ' AS INT) ';
-            }
-            break;
-        case 'oracle':
-            if (!$text) {
-                $sql = ' CAST(' . $fieldname . ' AS INT) ';
-            } else {
-                $sql = ' CAST(' . sql_compare_text($fieldname) . ' AS INT) ';
-            }
-            break;
-        default:
-            $sql = ' ' . $fieldname . ' ';
-    }
-
-    return $sql;
-}
-
-/**
- * Returns the SQL text to be used in order to perform one bitwise AND operation
- * between 2 integers.
- * @param integer int1 first integer in the operation
- * @param integer int2 second integer in the operation
- * @return string the piece of SQL code to be used in your statement.
- */
-function sql_bitand($int1, $int2) {
-
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'oracle':
-            return 'bitand((' . $int1 . '), (' . $int2 . '))';
-            break;
-        default:
-            return '((' . $int1 . ') & (' . $int2 . '))';
-    }
-}
-
-/**
- * Returns the SQL text to be used in order to perform one bitwise OR operation
- * between 2 integers.
- * @param integer int1 first integer in the operation
- * @param integer int2 second integer in the operation
- * @return string the piece of SQL code to be used in your statement.
- */
-function sql_bitor($int1, $int2) {
-
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'oracle':
-            return '((' . $int1 . ') + (' . $int2 . ') - ' . sql_bitand($int1, $int2) . ')';
-            break;
-        default:
-            return '((' . $int1 . ') | (' . $int2 . '))';
-    }
-}
-
-/**
- * Returns the SQL text to be used in order to perform one bitwise XOR operation
- * between 2 integers.
- * @param integer int1 first integer in the operation
- * @param integer int2 second integer in the operation
- * @return string the piece of SQL code to be used in your statement.
- */
-function sql_bitxor($int1, $int2) {
-
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'oracle':
-            return '(' . sql_bitor($int1, $int2) . ' - ' . sql_bitand($int1, $int2) . ')';
-            break;
-        case 'postgres':
-            return '((' . $int1 . ') # (' . $int2 . '))';
-            break;
-        default:
-            return '((' . $int1 . ') ^ (' . $int2 . '))';
-    }
-}
-
-/**
- * Returns the SQL text to be used in order to perform one bitwise NOT operation
- * with 1 integer.
- * @param integer int1 integer in the operation
- * @return string the piece of SQL code to be used in your statement.
- */
-function sql_bitnot($int1) {
-
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'oracle':
-            return '((0 - (' . $int1 . ')) - 1)';
-            break;
-        default:
-            return '(~(' . $int1 . '))';
-    }
-}
-
-/**
- * Returns the FROM clause required by some DBs in all SELECT statements
- * To be used in queries not having FROM clause to provide cross_db
- */
-function sql_null_from_clause() {
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'oracle':
-            return ' FROM dual';
-            break;
-        default:
-            return '';
-    }
-}
-
-/**
- * Returns the correct CEIL expression applied to fieldname
- * @param string fieldname the field (or expression) we are going to ceil
- * @return string the piece of SQL code to be used in your ceiling statement
- */
-function sql_ceil($fieldname) {
-    global $CFG;
-
-    switch ($CFG->dbfamily) {
-        case 'mssql':
-            return ' CEILING(' . $fieldname . ')';
-            break;
-        default:
-            return ' CEIL(' . $fieldname . ')';
     }
 }
 
@@ -2445,7 +1814,6 @@ function oracle_dirty_hack ($table, &$dataobject, $usecache = true) {
         }
     }
 }
-/// End of DIRTY HACK
 
 /**
  * This function will search for all the CLOBs and BLOBs fields passed in the dataobject, replacing
@@ -2839,5 +2207,3 @@ function rcache_unset_table ($table) {
     }
     return true;
 }
-
-?>

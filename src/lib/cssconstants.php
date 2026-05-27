@@ -78,5 +78,3 @@ function replace_cssconstants($css) {
     return ($css);
 }
 
-// vim:autoindent:expandtab:shiftwidth=4:tabstop=4:tw=140:
-?>

@@ -1,14 +1,14 @@
 <?php
 
-require_once('../../../config.php');
-require_once($CFG->dirroot . '/ws/lib.php');
+require_once '../../../config.php';
+require_once $CFG->dirroot . '/ws/lib.php';
 
 if (!isset($_GET['wsdl'])) {
     // save log registering the call to the ws server
     add_to_log(2, 1);
     if ($CFG->debugmode) {
         // save log registering the xml received headers
-        add_to_log(2, '2-1', serialize($HTTP_RAW_POST_DATA), true);
+        add_to_log(2, '2-1', serialize(file_get_contents('php://input')), true);
     }
 }
 
@@ -464,6 +464,8 @@ function UserAuthentication($post_data) {
 }
 
 generate_wsdl();
+
+ini_set('soap.wsdl_cache_enabled', WSDL_CACHE_NONE);
 
 $server = new SoapServer($CFG->dataroot . '/1/WebServices/wsBooksStructure/wsBooksStructure.wsdl', ['soap_version' => SOAP_1_1]);
 

@@ -6,5 +6,5 @@
 // This is compared against the values stored in the database to determine
 // whether upgrades should be performed (see lib/db/*.php)
 
-$version = 2025061000; // YYYYMMDDXX format, where XX is the build number for that day.
-$release = '1.1.0';
+$version = 2026052600; // YYYYMMDDXX format, where XX is the build number for that day.
+$release = '1.2.0';

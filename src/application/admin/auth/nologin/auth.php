@@ -1,22 +1,10 @@
 <?php
 
-/**
- * @author Petr Skoda
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package moodle multiauth
- *
- * Authentication Plugin: No Authentication
- *
- * No authentication at all. This method approves everything!
- *
- * 2007-02-18  File created.
- */
-
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
-require_once($CFG->libdir.'/authlib.php');
+require_once $CFG->libdir.'/authlib.php';
 
 /**
  * Plugin for no authentication - disabled user.
@@ -42,7 +30,7 @@ class auth_plugin_nologin extends auth_plugin_base {
     }
 
     function prevent_local_passwords() {
-        // just in case, we do not want to loose the passwords
+        // just in case, we do not want to lose the passwords
         return false;
     }
 

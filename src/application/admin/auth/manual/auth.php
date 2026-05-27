@@ -1,18 +1,7 @@
 <?php
-/**
- * @author Martin Dougiamas
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @package moodle multiauth
- *
- * Authentication Plugin: Manual Authentication
- *
- * Just does a simple check against the moodle database.
- *
- * 2006-08-28  File created.
- */
 
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
 require_once($CFG->libdir.'/authlib.php');

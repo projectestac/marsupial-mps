@@ -1,18 +1,18 @@
 <?php
 
-/// check if the application is already installed
+// check if the application is already installed
 if (!file_exists('../../../config.php')) {
     header('Location: ../../install.php');
     die;
 }
 
-/// load libraries
-require_once('../../../config.php');
+// Load libraries.
+require_once '../../../config.php';
 
-//initialize variables
+// Initialize variable.
 $errormsg = '';
 
-/// Check for timed out sessions
+// Check for timed out sessions
 if (!empty($SESSION->has_timed_out)) {
     $session_has_timed_out = true;
     $SESSION->has_timed_out = false;
@@ -20,11 +20,11 @@ if (!empty($SESSION->has_timed_out)) {
     $session_has_timed_out = false;
 }
 
-/// check if there are data to autheticate
+// check if there are data to authenticaticate.
 if ($frm = data_submitted()) {
-    $frm->username = trim(moodle_strtolower($frm->username));
+    $frm->username = mb_strtolower(trim($frm->username));
     if (!$user = get_record('user', 'username', $frm->username, 'password', md5($frm->password))) {
-        $errormsg = get_string("errorloggin");
+        $errormsg = get_string('errorloggin');
     } else {
         $USER = complete_user_login($user);
         header ('Location:' . $CFG->wwwroot . '/application/admin/');
@@ -34,16 +34,16 @@ if ($frm = data_submitted()) {
 
 print_header($CFG->sitename, $CFG->sitename);
 
-/// print page content header
+// print page content header
 print_container_start(true, 'content-header', 'content-header');
 corner_left_top();
 corner_left_bottom();
 corner_right_top();
 corner_right_bottom();
-echo "<br>";
+echo '<br>';
 print_container_end();
 
-/// print page content
+// print page content
 print_container_start(true, 'content-body', 'content-body');
 corner_left_top();
 corner_left_bottom();

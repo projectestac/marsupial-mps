@@ -1,13 +1,11 @@
 <?php
-// BASED ON MOODLE 1.9.9. ARCHITECTURE
 
 // check if the application is already installed
 if (!file_exists('../config.php')) {
-    header('Location: install.php');
-    die;
+    die('Application not installed.');
 }
 
-require_once('../config.php');
+require_once '../config.php';
 
 global $CFG;
 
@@ -17,6 +15,7 @@ echo '<script type="text/javascript" src="' . $CFG->wwwroot . '/application/view
 echo '<script type="text/javascript" src="' . $CFG->wwwroot . '/lib/jquery/jquery.scrollTo.js"></script>';
 
 $filter = optional_param('filter', '', PARAM_HOST);
+
 echo '
     <script type="text/javascript">
         var filter = "' . $filter . '";
@@ -33,8 +32,8 @@ corner_right_bottom();
 
 echo '<form method="post">' .
     get_string('filter') . ': <input type="text" name="filter" value="' . $filter . '" maxlength="15">
-		<input type="hidden" id="lastid" value="0">
-		<input type="submit" value="' . get_string('filterbutton') . '"> ' . get_string('filterexample', '', getremoteaddr()) .
+        <input type="hidden" id="lastid" value="0">
+        <input type="submit" value="' . get_string('filterbutton') . '"> ' . get_string('filterexample', '', getremoteaddr()) .
     '</form>';
 echo '<div id="lasttimediv" style="float:right; margin-top:-20px;"></div>';
 
@@ -62,6 +61,4 @@ echo '
 ';
 
 print_container_end();
-
-// print footer
 print_footer();

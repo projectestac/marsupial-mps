@@ -407,69 +407,6 @@ function addslashes_recursive($var) {
 }
 
 /**
- * This does a search and replace, ignoring case
- * This function is only used for versions of PHP older than version 5
- * which do not have a native version of this function.
- * Taken from the PHP manual, by bradhuizenga @ softhome.net
- *
- * @param string $find the string to search for
- * @param string $replace the string to replace $find with
- * @param string $string the string to search through
- * return string
- */
-if (!function_exists('str_ireplace')) {    /// Only exists in PHP 5
-    function str_ireplace($find, $replace, $string) {
-
-        if (!is_array($find)) {
-            $find = array($find);
-        }
-
-        if(!is_array($replace)) {
-            if (!is_array($find)) {
-                $replace = array($replace);
-            } else {
-                // this will duplicate the string into an array the size of $find
-                $c = count($find);
-                $rString = $replace;
-                unset($replace);
-                for ($i = 0; $i < $c; $i++) {
-                    $replace[$i] = $rString;
-                }
-            }
-        }
-
-        foreach ($find as $fKey => $fItem) {
-            $between = explode(strtolower($fItem),strtolower($string));
-            $pos = 0;
-            foreach($between as $bKey => $bItem) {
-                $between[$bKey] = substr($string,$pos,strlen($bItem));
-                $pos += strlen($bItem) + strlen($fItem);
-            }
-            $string = implode($replace[$fKey],$between);
-        }
-        return ($string);
-    }
-}
-
-/**
- * Locate the position of a string in another string
- *
- * This function is only used for versions of PHP older than version 5
- * which do not have a native version of this function.
- * Taken from the PHP manual, by dmarsh @ spscc.ctc.edu
- *
- * @param string $haystack The string to be searched
- * @param string $needle The string to search for
- * @param int $offset The position in $haystack where the search should begin.
- */
-if (!function_exists('stripos')) {    /// Only exists in PHP 5
-    function stripos($haystack, $needle, $offset=0) {
-
-        return strpos(strtoupper($haystack), strtoupper($needle), $offset);
-    }
-}
-
-/**
  * This function will print a button/link/etc. form element
  * that will work on both Javascript and non-javascript browsers.
  * Relies on the Javascript function openpopup in javascript.php
@@ -884,198 +821,6 @@ $targetwindow='self', $selectlabel='', $optionsextra=NULL, $gobutton=NULL) {
     }
 }
 
-/**
- * Given text in a variety of format codings, this function returns
- * the text as safe HTML.
- *
- * This function should mainly be used for long strings like posts,
- * answers, glossary items etc. For short strings @see format_string().
- *
- * @uses $CFG
- * @uses FORMAT_MOODLE
- * @uses FORMAT_HTML
- * @uses FORMAT_PLAIN
- * @uses FORMAT_WIKI
- * @uses FORMAT_MARKDOWN
- * @param string $text The text to be formatted. This is raw text originally from user input.
- * @param int $format Identifier of the text format to be used
- *            (FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_WIKI, FORMAT_MARKDOWN)
- * @param  array $options ?
- * @param int $courseid ?
- * @return string
- * @todo Finish documenting this function
- */
-function format_text($text, $format=FORMAT_MOODLE, $options=NULL, $courseid=NULL) {
-
-    global $CFG, $COURSE;
-
-    static $croncache = array();
-
-    if ($text === '') {
-        return ''; // no need to do any filters and cleaning
-    }
-
-    if (!isset($options->trusttext)) {
-        $options->trusttext = false;
-    }
-
-    if (!isset($options->noclean)) {
-        $options->noclean=false;
-    }
-    if (!isset($options->nocache)) {
-        $options->nocache=false;
-    }
-    if (!isset($options->smiley)) {
-        $options->smiley=true;
-    }
-    if (!isset($options->filter)) {
-        $options->filter=true;
-    }
-    if (!isset($options->para)) {
-        $options->para=true;
-    }
-    if (!isset($options->newlines)) {
-        $options->newlines=true;
-    }
-
-    if (empty($courseid)) {
-        $courseid = $COURSE->id;
-    }
-
-    if (!empty($CFG->cachetext) and empty($options->nocache)) {
-        $time = time() - $CFG->cachetext;
-        $md5key = md5($text.'-'.(int)$courseid.'-'.current_language().'-'.(int)$format.(int)$options->trusttext.(int)$options->noclean.(int)$options->smiley.(int)$options->filter.(int)$options->para.(int)$options->newlines);
-
-        if (defined('FULLME') and FULLME == 'cron') {
-            if (isset($croncache[$md5key])) {
-                return $croncache[$md5key];
-            }
-        }
-
-        if ($oldcacheitem = get_record_sql('SELECT * FROM '.$CFG->prefix.'cache_text WHERE md5key = \''.$md5key.'\'', true)) {
-            if ($oldcacheitem->timemodified >= $time) {
-                if (defined('FULLME') and FULLME == 'cron') {
-                    if (count($croncache) > 150) {
-                        reset($croncache);
-                        $key = key($croncache);
-                        unset($croncache[$key]);
-                    }
-                    $croncache[$md5key] = $oldcacheitem->formattedtext;
-                }
-                return $oldcacheitem->formattedtext;
-            }
-        }
-    }
-
-    // trusttext overrides the noclean option!
-    if ($options->trusttext) {
-        if (trusttext_present($text)) {
-            $text = trusttext_strip($text);
-            if (!empty($CFG->enabletrusttext)) {
-                $options->noclean = true;
-            } else {
-                $options->noclean = false;
-            }
-        } else {
-            $options->noclean = false;
-        }
-    } else if (!debugging('', DEBUG_DEVELOPER)) {
-        // strip any forgotten trusttext in non-developer mode
-        // do not forget to disable text cache when debugging trusttext!!
-        $text = trusttext_strip($text);
-    }
-
-    $CFG->currenttextiscacheable = true;   // Default status - can be changed by any filter
-
-    switch ($format) {
-        case FORMAT_HTML:
-            if ($options->smiley) {
-                replace_smilies($text);
-            }
-            if (!$options->noclean) {
-                $text = clean_text($text, FORMAT_HTML);
-            }
-            if ($options->filter) {
-                $text = filter_text($text, $courseid);
-            }
-            break;
-
-        case FORMAT_PLAIN:
-            $text = s($text); // cleans dangerous JS
-            $text = rebuildnolinktag($text);
-            $text = str_replace('  ', '&nbsp; ', $text);
-            $text = nl2br($text);
-            break;
-
-        case FORMAT_WIKI:
-            // this format is deprecated
-            $text = '<p>NOTICE: Wiki-like formatting has been removed from Moodle.  You should not be seeing
-                     this message as all texts should have been converted to Markdown format instead.
-                     Please post a bug report to http://moodle.org/bugs with information about where you
-                     saw this message.</p>'.s($text);
-            break;
-
-        case FORMAT_MARKDOWN:
-            $text = markdown_to_html($text);
-            if ($options->smiley) {
-                replace_smilies($text);
-            }
-            if (!$options->noclean) {
-                $text = clean_text($text, FORMAT_HTML);
-            }
-
-            if ($options->filter) {
-                $text = filter_text($text, $courseid);
-            }
-            break;
-
-        default:  // FORMAT_MOODLE or anything else
-            $text = text_to_html($text, $options->smiley, $options->para, $options->newlines);
-            if (!$options->noclean) {
-                $text = clean_text($text, FORMAT_HTML);
-            }
-
-            if ($options->filter) {
-                $text = filter_text($text, $courseid);
-            }
-            break;
-    }
-
-    if (empty($options->nocache) and !empty($CFG->cachetext) and $CFG->currenttextiscacheable) {
-        if (defined('FULLME') and FULLME == 'cron') {
-            // special static cron cache - no need to store it in db if its not already there
-            if (count($croncache) > 150) {
-                reset($croncache);
-                $key = key($croncache);
-                unset($croncache[$key]);
-            }
-            $croncache[$md5key] = $text;
-            return $text;
-        }
-
-        $newcacheitem = new stdClass();
-        $newcacheitem->md5key = $md5key;
-        $newcacheitem->formattedtext = addslashes($text);
-        $newcacheitem->timemodified = time();
-        if ($oldcacheitem) {                               // See bug 4677 for discussion
-            $newcacheitem->id = $oldcacheitem->id;
-            @update_record('cache_text', $newcacheitem);   // Update existing record in the cache table
-                                                           // It's unlikely that the cron cache cleaner could have
-                                                           // deleted this entry in the meantime, as it allows
-                                                           // some extra time to cover these cases.
-        } else {
-            @insert_record('cache_text', $newcacheitem);   // Insert a new record in the cache table
-                                                           // Again, it's possible that another user has caused this
-                                                           // record to be created already in the time that it took
-                                                           // to traverse this function.  That's OK too, as the
-                                                           // call above handles duplicate entries, and eventually
-                                                           // the cron cleaner will delete them.
-        }
-    }
-
-    return $text;
-}
-
 /** Given a simple string, this function returns the string
  *  processed by enabled string filters if $CFG->filterall is enabled
  *
@@ -1138,47 +883,6 @@ function format_string ($string, $striplinks=true, $courseid=NULL ) {
 }
 
 /**
- * Given some text in HTML format, this function will pass it
- * through any filters that have been defined in $CFG->textfilterx
- * The variable defines a filepath to a file containing the
- * filter function.  The file must contain a variable called
- * $textfilter_function which contains the name of the function
- * with $courseid and $text parameters
- *
- * @param string $text The text to be passed through format filters
- * @param int $courseid ?
- * @return string
- * @todo Finish documenting this function
- */
-function filter_text($text, $courseid=NULL) {
-    global $CFG, $COURSE;
-
-    if (empty($courseid)) {
-        $courseid = $COURSE->id;       // (copied from format_text)
-    }
-
-    if (!empty($CFG->textfilters)) {
-        require_once($CFG->libdir.'/filterlib.php');
-        $textfilters = explode(',', $CFG->textfilters);
-        foreach ($textfilters as $textfilter) {
-            if (is_readable($CFG->dirroot .'/'. $textfilter .'/filter.php')) {
-                include_once($CFG->dirroot .'/'. $textfilter .'/filter.php');
-                $functionname = basename($textfilter).'_filter';
-                if (function_exists($functionname)) {
-                    $text = $functionname($courseid, $text);
-                }
-            }
-        }
-    }
-
-    /// <nolink> tags removed for XHTML compatibility
-    $text = str_replace('<nolink>', '', $text);
-    $text = str_replace('</nolink>', '', $text);
-
-    return $text;
-}
-
-/**
  * Given a string (short text) in HTML format, this function will pass it
  * through any filters that have been defined in $CFG->stringfilters
  * The variable defines a filepath to a file containing the
@@ -1235,44 +939,6 @@ function filter_string($string, $courseid=NULL) {
     $string = str_replace('</nolink>', '', $string);
 
     return $string;
-}
-
-/**
- * Is the text marked as trusted?
- *
- * @param string $text text to be searched for TRUSTTEXT marker
- * @return boolean
- */
-function trusttext_present($text) {
-    if (strpos($text, TRUSTTEXT) !== FALSE) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/**
- * This funtion MUST be called before the cleaning or any other
- * function that modifies the data! We do not know the origin of trusttext
- * in database, if it gets there in tweaked form we must not convert it
- * to supported form!!!
- *
- * Please be carefull not to use stripslashes on data from database
- * or twice stripslashes when processing data recieved from user.
- *
- * @param string $text text that may contain TRUSTTEXT marker
- * @return text without any TRUSTTEXT marker
- */
-function trusttext_strip($text) {
-    global $CFG;
-
-    while (true) { //removing nested TRUSTTEXT
-        $orig = $text;
-        $text = str_replace(TRUSTTEXT, '', $text);
-        if (strcmp($orig, $text) === 0) {
-            return $text;
-        }
-    }
 }
 
 /**
@@ -1441,135 +1107,6 @@ function cleanAttributes2($htmlArray){
 }
 
 /**
- * Replaces all known smileys in the text with image equivalents
- *
- * @uses $CFG
- * @param string $text Passed by reference. The string to search for smily strings.
- * @return string
- */
-function replace_smilies(&$text) {
-
-    global $CFG;
-
-    if (empty($CFG->emoticons)) { /// No emoticons defined, nothing to process here
-        return;
-    }
-
-    $lang = current_language();
-    $emoticonstring = $CFG->emoticons;
-    static $e = array();
-    static $img = array();
-    static $emoticons = null;
-
-    if (is_null($emoticons)) {
-        $emoticons = array();
-        if ($emoticonstring) {
-            $items = explode('{;}', $CFG->emoticons);
-            foreach ($items as $item) {
-               $item = explode('{:}', $item);
-              $emoticons[$item[0]] = $item[1];
-            }
-        }
-    }
-
-
-    if (empty($img[$lang])) {  /// After the first time this is not run again
-        $e[$lang] = array();
-        $img[$lang] = array();
-        foreach ($emoticons as $emoticon => $image){
-            $alttext = get_string($image, 'pix');
-            $alttext = preg_replace('/^\[\[(.*)\]\]$/', '$1', $alttext); /// Clean alttext in case there isn't lang string for it.
-            $e[$lang][] = $emoticon;
-            $img[$lang][] = '<img alt="'. $alttext .'" width="15" height="15" src="'. $CFG->pixpath .'/s/'. $image .'.gif" />';
-        }
-    }
-
-    // Exclude from transformations all the code inside <script> tags
-    // Needed to solve Bug 1185. Thanks to jouse 2001 detecting it. :-)
-    // Based on code from glossary fiter by Williams Castillo.
-    //       - Eloy
-
-    // Detect all the <script> zones to take out
-    $excludes = array();
-    preg_match_all('/<script language(.+?)<\/script>/is',$text,$list_of_excludes);
-
-    // Take out all the <script> zones from text
-    foreach (array_unique($list_of_excludes[0]) as $key=>$value) {
-        $excludes['<+'.$key.'+>'] = $value;
-    }
-    if ($excludes) {
-        $text = str_replace($excludes,array_keys($excludes),$text);
-    }
-
-/// this is the meat of the code - this is run every time
-    $text = str_replace($e[$lang], $img[$lang], $text);
-
-    // Recover all the <script> zones to text
-    if ($excludes) {
-        $text = str_replace(array_keys($excludes),$excludes,$text);
-    }
-}
-
-/**
- * Given plain text, makes it into HTML as nicely as possible.
- * May contain HTML tags already
- *
- * @uses $CFG
- * @param string $text The string to convert.
- * @param boolean $smiley Convert any smiley characters to smiley images?
- * @param boolean $para If true then the returned string will be wrapped in paragraph tags
- * @param boolean $newlines If true then lines newline breaks will be converted to HTML newline breaks.
- * @return string
- */
-
-function text_to_html($text, $smiley=true, $para=true, $newlines=true) {
-///
-
-    global $CFG;
-
-/// Remove any whitespace that may be between HTML tags
-    $text = preg_replace("/>([[:space:]]+)</", "><", $text);
-
-/// Remove any returns that precede or follow HTML tags
-    $text = preg_replace("/([\n\r])</", " <", $text);
-    $text = preg_replace("/>([\n\r])/", "> ", $text);
-
-    convert_urls_into_links($text);
-
-/// Make returns into HTML newlines.
-    if ($newlines) {
-        $text = nl2br($text);
-    }
-
-/// Turn smileys into images.
-    if ($smiley) {
-        replace_smilies($text);
-    }
-
-/// Wrap the whole thing in a paragraph tag if required
-    if ($para) {
-        return '<p>'.$text.'</p>';
-    } else {
-        return $text;
-    }
-}
-
-/**
- * Given Markdown formatted text, make it into XHTML using external function
- *
- * @uses $CFG
- * @param string $text The markdown formatted text to be converted.
- * @return string Converted text
- */
-function markdown_to_html($text) {
-    global $CFG;
-
-    require_once($CFG->libdir .'/markdown.php');
-
-    return Markdown($text);
-}
-
-/**
  * Given HTML text, make it into plain text using external function
  *
  * @uses $CFG
@@ -1586,52 +1123,6 @@ function html_to_text($html) {
     $result = $h2t->get_text();
 
     return $result;
-}
-
-/**
- * Given some text this function converts any URLs it finds into HTML links
- *
- * @param string $text Passed in by reference. The string to be searched for urls.
- */
-function convert_urls_into_links(&$text) {
-    //I've added img tags to this list of tags to ignore.
-    //See MDL-21168 for more info. A better way to ignore tags whether or not
-    //they are escaped partially or completely would be desirable. For example:
-    //<a href="blah">
-    //&lt;a href="blah"&gt;
-    //&lt;a href="blah">
-    $filterignoretagsopen  = array('<a\s[^>]+?>');
-    $filterignoretagsclose = array('</a>');
-    filter_save_ignore_tags($text,$filterignoretagsopen,$filterignoretagsclose,$ignoretags);
-
-    // Check if we support unicode modifiers in regular expressions. Cache it.
-    // TODO: this check should be a environment requirement in Moodle 2.0, as far as unicode
-    // chars are going to arrive to URLs officially really soon (2010?)
-    // Original RFC regex from: http://www.bytemycode.com/snippets/snippet/796/
-    // Various ideas from: http://alanstorm.com/url_regex_explained
-    // Unicode check, negative assertion and other bits from Moodle.
-    static $unicoderegexp;
-    if (!isset($unicoderegexp)) {
-        $unicoderegexp = @preg_match('/\pL/u', 'a'); // This will fail silenty, returning false,
-    }
-
-    $unicoderegexp = false;//force non use of unicode modifiers. MDL-21296
-    if ($unicoderegexp) { //We can use unicode modifiers
-        $text = preg_replace('#(?<!=["\'])(((http(s?))://)(((([\pLl0-9]([\pLl0-9]|-)*[\pLl0-9]|[\pLl0-9])\.)+([\pLl]([\pLl0-9]|-)*[\pLl0-9]|[\pLl]))|(([0-9]{1,3}\.){3}[0-9]{1,3}))(:[\pL0-9]*)?(/([\pLl0-9\.!$&\'\(\)*+,;=_~:@-]|%[a-fA-F0-9]{2})*)*(\?([\pLl0-9\.!$&\'\(\)*+,;=_~:@/?-]|%[a-fA-F0-9]{2})*)?(\#[\pLl0-9\.!$&\'\(\)*+,;=_~:@/?-]*)?)(?<![,\.;])#iu',
-                             '<a href="\\1" target="_blank">\\1</a>', $text);
-        $text = preg_replace('#(?<!=["\']|//)((www\.([\pLl0-9]([\pLl0-9]|-)*[\pLl0-9]|[\pLl0-9])\.)+([\pLl]([\pLl0-9]|-)*[\pLl0-9]|[\pLl])(:[\pL0-9]*)?(/([\pLl0-9\.!$&\'\(\)*+,;=_~:@-]|%[a-fA-F0-9]{2})*)*(\?([\pLl0-9\.!$&\'\(\)*+,;=_~:@/?-]|%[a-fA-F0-9]{2})*)?(\#[\pLl0-9\.!$&\'\(\)*+,;=_~:@/?-]*)?)(?<![,\.;])#iu',
-                             '<a href="http://\\1" target="_blank">\\1</a>', $text);
-    } else { //We cannot use unicode modifiers
-        $text = preg_replace('#(?<!=["\'])(((http(s?))://)(((([a-z0-9]([a-z0-9]|-)*[a-z0-9]|[a-z0-9])\.)+([a-z]([a-z0-9]|-)*[a-z0-9]|[a-z]))|(([0-9]{1,3}\.){3}[0-9]{1,3}))(:[a-zA-Z0-9]*)?(/([a-z0-9\.!$&\'\(\)*+,;=_~:@-]|%[a-f0-9]{2})*)*(\?([a-z0-9\.!$&\'\(\)*+,;=_~:@/?-]|%[a-fA-F0-9]{2})*)?(\#[a-z0-9\.!$&\'\(\)*+,;=_~:@/?-]*)?)(?<![,\.;])#i',
-                             '<a href="\\1" target="_blank">\\1</a>', $text);
-        $text = preg_replace('#(?<!=["\']|//)((www\.([a-z0-9]([a-z0-9]|-)*[a-z0-9]|[a-z0-9])\.)+([a-z]([a-z0-9]|-)*[a-z0-9]|[a-z])(:[a-zA-Z0-9]*)?(/([a-z0-9\.!$&\'\(\)*+,;=_~:@-]|%[a-f0-9]{2})*)*(\?([a-z0-9\.!$&\'\(\)*+,;=_~:@/?-]|%[a-fA-F0-9]{2})*)?(\#[a-z0-9\.!$&\'\(\)*+,;=_~:@/?-]*)?)(?<![,\.;])#i',
-                             '<a href="http://\\1" target="_blank">\\1</a>', $text);
-    }
-
-    if (!empty($ignoretags)) {
-        $ignoretags = array_reverse($ignoretags); /// Reversed so "progressive" str_replace() will solve some nesting problems.
-        $text = str_replace(array_keys($ignoretags),$ignoretags,$text);
-    }
 }
 
 /**
@@ -1655,7 +1146,7 @@ function get_html_lang($dir = false) {
     return ($direction.' lang="'.$language.'" xml:lang="'.$language.'"');
 }
 
-/// STANDARD WEB PAGE PARTS ///////////////////////////////////////////////////
+/// STANDARD WEB PAGE PARTS
 
 /**
  * Print a standard header
@@ -3535,19 +3026,6 @@ function notice_yesno ($message, $linkyes, $linkno, $optionsyes=NULL, $optionsno
 }
 
 /**
- * Provide an definition of error_get_last for PHP before 5.2.0. This simply
- * returns NULL, since there is not way to get the right answer.
- */
-if (!function_exists('error_get_last')) {
-    // the eval is needed to prevent PHP 5.2+ from getting a parse error!
-    eval('
-        function error_get_last() {
-            return NULL;
-        }
-    ');
-}
-
-/**
  * Redirects the user to another page, after printing a notice
  *
  * @param string $url The url to take the user to
@@ -3698,20 +3176,6 @@ function notify($message, $style='notifyproblem', $align='center', $return=false
 }
 
 /**
- * This function is used to rebuild the <nolink> tag because some formats (PLAIN and WIKI)
- * will transform it to html entities
- *
- * @param string $text Text to search for nolink tag in
- * @return string
- */
-function rebuildnolinktag($text) {
-
-    $text = preg_replace('/&lt;(\/*nolink)&gt;/i','<$1>',$text);
-
-    return $text;
-}
-
-/**
  * Prints out code needed for spellchecking.
  * Original idea by Ludo (Marc Alier).
  *
@@ -3849,41 +3313,6 @@ function convert_tree_to_html($tree, $row=0) {
         $str .= ' </li>'."\n";
     }
     $str .= '</ul>'."\n";
-
-    return $str;
-}
-
-/**
- * Returns a string containing a link to the user documentation.
- * Also contains an icon by default. Shown to teachers and admin only.
- *
- * @param string $path      The page link after doc root and language, no
- *                              leading slash.
- * @param string $text      The text to be displayed for the link
- * @param string $iconpath  The path to the icon to be displayed
- */
-function doc_link($path='', $text='', $iconpath='') {
-    global $CFG;
-
-    if (empty($CFG->docroot)) {
-        return '';
-    }
-
-    $target = '';
-    if (!empty($CFG->doctonewwindow)) {
-        $target = ' target="_blank"';
-    }
-
-    $lang = str_replace('_utf8', '', current_language());
-
-    $str = '<a href="' .$CFG->docroot. '/' .$lang. '/' .$path. '"' .$target. '>';
-
-    if (empty($iconpath)) {
-        $iconpath = $CFG->httpswwwroot . '/pix/docs.gif';
-    }
-
-    // alt left blank intentionally to prevent repetition in screenreaders
-    $str .= '<img class="iconhelp" src="' .$iconpath. '" alt="" />' .$text. '</a>';
 
     return $str;
 }

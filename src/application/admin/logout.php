@@ -1,6 +1,6 @@
 <?php
 
-require_once("../../../config.php");
+require_once '../../../config.php';
 
 $redirect = $CFG->wwwroot;
 
@@ -19,7 +19,7 @@ if (!isloggedin()) {
     corner_left_bottom();
     corner_right_top();
     corner_right_bottom();
-    echo "<br>";
+    echo '<br>';
     print_container_end();
 
     /// print page content body
@@ -28,7 +28,7 @@ if (!isloggedin()) {
     corner_left_bottom();
     corner_right_top();
     corner_right_bottom();
-    notice_yesno(get_string('logoutconfirm'), 'logout.php', $redirect, array('sesskey' => sesskey()), null, 'post', 'get');
+    notice_yesno(get_string('logoutconfirm'), 'logout.php', $redirect, ['sesskey' => sesskey()], null, 'post', 'get');
     print_container_end();
     print_footer();
 }

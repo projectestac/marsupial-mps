@@ -378,7 +378,3 @@ function init_eaccelerator() {
     unset($MCACHE);
     return false;
 }
-
-
-
-?>

@@ -35,7 +35,7 @@ function addslashes_object($dataobject) {
     return (object)$a;
 }
 
-/// USER DATABASE ////////////////////////////////////////////////
+/// USER DATABASE
 
 /**
  * Returns list of all admins, using 1 DB query. It depends on DB schema v1.7
@@ -66,15 +66,6 @@ function get_admins() {
             JOIN ($sql) ra
               ON u.id=ra.userid
             ORDER BY ra.adminid ASC";
-
-    return get_records_sql($sql);
-}
-
-function get_courses_in_metacourse($metacourseid) {
-    global $CFG;
-
-    $sql = "SELECT c.id,c.shortname,c.fullname FROM {$CFG->prefix}course c, {$CFG->prefix}course_meta mc WHERE mc.parent_course = $metacourseid
-        AND mc.child_course = c.id ORDER BY c.shortname";
 
     return get_records_sql($sql);
 }
@@ -144,7 +135,7 @@ function get_users($get = true, $search = '', $confirmed = false, $exceptions = 
     }
 }
 
-/// OTHER SITE AND COURSE FUNCTIONS /////////////////////////////////////////////
+/// OTHER SITE AND COURSE FUNCTIONS
 
 /**
  * Returns $course object of the top-level site.
@@ -590,7 +581,7 @@ function update_timezone_records($timezones) {
     }
 }
 
-/// LOG FUNCTIONS /////////////////////////////////////////////////////
+/// LOG FUNCTIONS
 
 /**
  * Add an entry to the log table.
@@ -658,7 +649,7 @@ function count_login_failures($mode, $username, $lastlogin) {
     return NULL;
 }
 
-/// GENERAL HELPFUL THINGS  ///////////////////////////////////
+/// GENERAL HELPFUL THINGS
 
 /**
  * Dump a given object's information in a PRE block.
