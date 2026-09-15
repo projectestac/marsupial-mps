@@ -212,14 +212,15 @@ if ($reg_credential = get_record("lms_ws_credentials", "success", "1")) {
 
         $params = new ResultadoDetalleExtendido();
         $params->ResultadoExtendido = new SoapVar($result, SOAP_ENC_OBJECT, "SeguimientoExtendido", "http://educacio.gencat.cat/agora/seguimiento/");
-        // Proxy settings - Transformacion CPD.        
-        if (isset($CFG->proxy_host) && $CFG->proxy_host != "") {
-            $client = new soapclient($reg_session->wsurltracking . '?wsdl', array('trace' => 1, 'proxy_host' => $CFG->proxy_host, 'proxy_port' => $CFG->proxy_port, 'proxy_login' => $CFG->proxy_user, 'proxy_password' => $CFG->proxy_pass));
+
+        // Proxy settings.
+        if (isset($CFG->proxy_host) && $CFG->proxy_host !== '') {
+            $client = new soapclient($reg_session->wsurltracking . '?wsdl', ['trace' => 1, 'proxy_host' => $CFG->proxy_host, 'proxy_port' => $CFG->proxy_port, 'proxy_login' => $CFG->proxy_user, 'proxy_password' => $CFG->proxy_pass]);
         } else {
-            $client = new soapclient($reg_session->wsurltracking . '?wsdl', array('trace' => 1));
+            $client = new soapclient($reg_session->wsurltracking . '?wsdl', ['trace' => 1]);
         }
 
-        $auth = array('User' => $reg_credential->username, 'Password' => $reg_credential->password);
+        $auth = ['User' => $reg_credential->username, 'Password' => $reg_credential->password];
 
         $namespace = rcommond_wdsl_parser($reg_session->wsurltracking.'?wsdl');
 

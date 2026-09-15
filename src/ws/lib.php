@@ -50,7 +50,7 @@ function rcommond_wdsl_parser($urlwdsl) {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $urlwdsl);
 
-    //Added proxy settings - Transformacion CPD.
+    // Proxy settings
     if (isset($CFG->proxy_host)) {
         $proxy = $CFG->proxy_host . ':' . $CFG->proxy_port;
         curl_setopt($curl, CURLOPT_PROXY, $proxy);
@@ -62,7 +62,6 @@ function rcommond_wdsl_parser($urlwdsl) {
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 
     $contents = curl_exec($curl);
-    curl_close($curl);
 
     $result = rcommon_xml2array($contents);
     //foreach to look in the array for key=definitios 
@@ -91,7 +90,6 @@ function rcommon_xml2array($contents, $get_attributes = 1) {
     xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
     xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 1);
     xml_parse_into_struct($parser, $contents, $xml_values);
-    xml_parser_free($parser);
 
     if (!$xml_values) {
         return;
