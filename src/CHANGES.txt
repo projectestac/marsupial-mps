@@ -1,8 +1,13 @@
-Release notes for SIMULADOR EDITORIAL MARSUPIAL (http://mps.xtec.cat)
+Release notes for SIMULADOR EDITORIAL MARSUPIAL (https://mps.xtec.cat)
 
 More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/marsupial-mps
 
+
+Changes 26.09.16
+---------------------------------------------------------------------------------------
+- Added error.html and llibre.html as default pages for the demo content
+- Updated references to the default pages in the code
 
 Changes 26.05.27
 ---------------------------------------------------------------------------------------
