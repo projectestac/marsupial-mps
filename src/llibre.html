@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Book</title>
+<style>
+    :root {
+        --paper: #fffdf5;
+        --ink: #2e2a1f;
+        --sun: #ffcb3d;
+        --sky: #6fc3e0;
+        --leaf: #6fb56a;
+        --berry: #e0596b;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background: var(--sky);
+        background-image:
+            radial-gradient(circle at 8% 12%, #ffffff55 0, transparent 40%),
+            radial-gradient(circle at 92% 85%, #ffffff40 0, transparent 45%);
+        font-family: "Comic Sans MS", "Marker Felt", "Chalkboard SE", "Bradley Hand", cursive, sans-serif;
+        color: var(--ink);
+    }
+
+    .page {
+        position: relative;
+        width: 100%;
+        max-width: 34rem;
+        background: var(--paper);
+        border: 0.6rem solid var(--sun);
+        border-radius: 1.75rem;
+        padding: 3rem 2.25rem 2.5rem;
+        text-align: center;
+        box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.18);
+    }
+
+    .doodle {
+        position: absolute;
+        font-size: 2.25rem;
+        line-height: 1;
+    }
+
+    .doodle.sun     { top: -1.6rem; left: -1.6rem; }
+    .doodle.star-a  { top: -0.9rem; right: 1.5rem; color: var(--sun); }
+    .doodle.star-b  { bottom: 1.2rem; left: 1.1rem; color: var(--berry); }
+    .doodle.leaf    { bottom: -1.5rem; right: -1rem; }
+
+    .stripe {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stripe span {
+        width: 0.9rem;
+        height: 0.9rem;
+        border-radius: 50%;
+        background: var(--sun);
+    }
+
+    .stripe span:nth-child(2) { background: var(--leaf); }
+    .stripe span:nth-child(3) { background: var(--berry); }
+
+    h1 {
+        margin: 0 0 0.75rem;
+        font-size: 2.4rem;
+        color: var(--berry);
+        text-shadow: 0.12rem 0.12rem 0 var(--sun);
+    }
+
+    p.lead {
+        margin: 0;
+        font-size: 1.4rem;
+        line-height: 1.6;
+    }
+
+    .underline {
+        display: inline-block;
+        border-bottom: 0.3rem solid var(--leaf);
+        border-radius: 0.2rem;
+        padding: 0 0.2rem;
+    }
+
+    .page-number {
+        margin-top: 2.25rem;
+        font-size: 1rem;
+        color: var(--ink);
+        opacity: 0.6;
+    }
+
+    .page-number::before,
+    .page-number::after {
+        content: "\2726";
+        color: var(--sun);
+        margin: 0 0.5rem;
+    }
+</style>
+</head>
+<body>
+<main class="page">
+    <span class="doodle sun" aria-hidden="true">&#9728;&#65039;</span>
+    <span class="doodle star-a" aria-hidden="true">&#10022;</span>
+    <span class="doodle star-b" aria-hidden="true">&#10022;</span>
+    <span class="doodle leaf" aria-hidden="true">&#127793;</span>
+
+    <div class="stripe">
+        <span></span><span></span><span></span>
+    </div>
+
+    <h1>Hello, reader!</h1>
+    <p class="lead">This is a <span class="underline">basic book</span>.</p>
+
+    <p class="page-number">page 1</p>
+</main>
+</body>
+</html>

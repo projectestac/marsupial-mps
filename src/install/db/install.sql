@@ -97,41 +97,41 @@ CREATE TABLE `prefix_books_credentials` (
 -- Volcar la base de datos para la tabla `mps_books_credentials`
 -- 
 
-INSERT INTO `prefix_books_credentials` VALUES (1, '1111111111', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html');
-INSERT INTO `prefix_books_credentials` VALUES (2, '1111111111', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (3, '1111111111', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (4, '1111111111', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (5, '1111111111', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (6, '2222222222', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html');
-INSERT INTO `prefix_books_credentials` VALUES (7, '2222222222', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (8, '2222222222', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (9, '2222222222', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (10, '2222222222', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (11, '3333333333', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html');
-INSERT INTO `prefix_books_credentials` VALUES (12, '3333333333', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (13, '3333333333', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (14, '3333333333', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (15, '3333333333', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (16, '4444444444', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html');
-INSERT INTO `prefix_books_credentials` VALUES (17, '4444444444', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (18, '4444444444', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (19, '4444444444', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (20, '4444444444', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (21, '5555555555', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html');
-INSERT INTO `prefix_books_credentials` VALUES (22, '5555555555', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (23, '5555555555', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (24, '5555555555', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (25, '5555555555', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (26, '6666666666', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html');
-INSERT INTO `prefix_books_credentials` VALUES (27, '6666666666', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (28, '6666666666', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (29, '6666666666', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (30, '6666666666', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (31, '7777777777', '1', 1, '1', 'URL generada correctament', 'http://www.xtec.cat/llibre.html'); 
-INSERT INTO `prefix_books_credentials` VALUES (32, '7777777777', '0', 0, '0', 'Error inesperat', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (33, '7777777777', '-1', 0, '-1', 'Error al realitzar la URL dinàmica', 'http://www.xtec.cat/error.html');
-INSERT INTO `prefix_books_credentials` VALUES (34, '7777777777', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'http://www.xtec.cat/error.html');                                   
-INSERT INTO `prefix_books_credentials` VALUES (35, '7777777777', '-4', 0, '-4', 'La llicencia ha expirat', 'http://www.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (1, '1111111111', '1', 1, '1', 'URL generat correctament', 'https://mps.xtec.cat/llibre.html');
+INSERT INTO `prefix_books_credentials` VALUES (2, '1111111111', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (3, '1111111111', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (4, '1111111111', '-2', 0, '-2', 'El codi de llicencia no es vàlid', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (5, '1111111111', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (6, '2222222222', '1', 1, '1', 'URL generat correctament', 'https://mps.xtec.cat/llibre.html');
+INSERT INTO `prefix_books_credentials` VALUES (7, '2222222222', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (8, '2222222222', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (9, '2222222222', '-2', 0, '-2', 'El codi de llicencia no és vàlid', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (10, '2222222222', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (11, '3333333333', '1', 1, '1', 'URL generat correctament', 'https://mps.xtec.cat/llibre.html');
+INSERT INTO `prefix_books_credentials` VALUES (12, '3333333333', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (13, '3333333333', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (14, '3333333333', '-2', 0, '-2', 'El codi de llicencia no és vàlid', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (15, '3333333333', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (16, '4444444444', '1', 1, '1', 'URL generat correctament', 'https://mps.xtec.cat/llibre.html');
+INSERT INTO `prefix_books_credentials` VALUES (17, '4444444444', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (18, '4444444444', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (19, '4444444444', '-2', 0, '-2', 'El codi de llicencia no és vàlid', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (20, '4444444444', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (21, '5555555555', '1', 1, '1', 'URL generat correctament', 'https://mps.xtec.cat/llibre.html');
+INSERT INTO `prefix_books_credentials` VALUES (22, '5555555555', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (23, '5555555555', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (24, '5555555555', '-2', 0, '-2', 'El codi de llicencia no és vàlid', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (25, '5555555555', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (26, '6666666666', '1', 1, '1', 'URL generada correctament', 'https://mps.xtec.cat/llibre.html');
+INSERT INTO `prefix_books_credentials` VALUES (27, '6666666666', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (28, '6666666666', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (29, '6666666666', '-2', 0, '-2', 'El codi de llicencia no és vàlid', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (30, '6666666666', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (31, '7777777777', '1', 1, '1', 'URL generada correctament', 'https://mps.xtec.cat/llibre.html'); 
+INSERT INTO `prefix_books_credentials` VALUES (32, '7777777777', '0', 0, '0', 'Error inesperat', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (33, '7777777777', '-1', 0, '-1', 'Error al realitzar l''URL dinàmic', 'https://mps.xtec.cat/error.html');
+INSERT INTO `prefix_books_credentials` VALUES (34, '7777777777', '-2', 0, '-2', 'El codi de llicencia no és vàlid', 'https://mps.xtec.cat/error.html');                                   
+INSERT INTO `prefix_books_credentials` VALUES (35, '7777777777', '-4', 0, '-4', 'La llicencia ha expirat', 'https://mps.xtec.cat/error.html');
 
 -- --------------------------------------------------------
 

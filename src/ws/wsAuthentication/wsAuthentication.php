@@ -177,7 +177,7 @@ function AutenticarUsuarioContenido($usrcontent)
                     if (!in_array($usrcontent->Rol, $alloweb_values)) {
                         $result->AutenticarUsuarioContenidoResult->Codigo = "-7";
                         $result->AutenticarUsuarioContenidoResult->Descripcion = "Rol incorrecte. El valor del rol &eacute;s incorrecte";
-                        $result->AutenticarUsuarioContenidoResult->URL = "http://www.xtec.cat/error.html";
+                        $result->AutenticarUsuarioContenidoResult->URL = "https://mps.xtec.cat/error.html";
                         return $result;
                     }
                 } else {
@@ -206,7 +206,7 @@ function AutenticarUsuarioContenido($usrcontent)
                                     add_to_log(1, '1-211', serialize(['ISBN' => $usrcontent->ISBN, 'unitcode' => $usrcontent->IdUnidad]), true);
                                     $result->AutenticarUsuarioContenidoResult->Codigo = "-5";
                                     $result->AutenticarUsuarioContenidoResult->Descripcion = "L'identificador de la unitat no &eacute;s v&agrave;lid";
-                                    $result->AutenticarUsuarioContenidoResult->URL = "http://www.xtec.cat/error.html";
+                                    $result->AutenticarUsuarioContenidoResult->URL = "https://mps.xtec.cat/error.html";
                                     return $result;
                                 } else {
                                     if ($bookpath->format == 'scorm') {
@@ -226,14 +226,14 @@ function AutenticarUsuarioContenido($usrcontent)
                                         add_to_log(1, '1-221', serialize(['ISBN' => $usrcontent->ISBN, 'unitcode' => $usrcontent->IdUnidad]), true);
                                         $result->AutenticarUsuarioContenidoResult->Codigo = '-5';
                                         $result->AutenticarUsuarioContenidoResult->Descripcion = "L'identificador de la unitat no &eacute;s v&agrave;lid";
-                                        $result->AutenticarUsuarioContenidoResult->URL = "http://www.xtec.cat/error.html";
+                                        $result->AutenticarUsuarioContenidoResult->URL = "https://mps.xtec.cat/error.html";
                                         return $result;
                                     } else {
                                         if (!$activitypath = get_record('books_activities', 'bookid', $bookpath->id, 'unitid', $unitpath->id, 'code', $usrcontent->IdActividad)) {
                                             add_to_log(1, '1-222', serialize(['ISBN' => $usrcontent->ISBN, 'unitcode' => $usrcontent->IdUnidad, 'activitycode' => $usrcontent->IdActividad, 'path' => $activitypath->path]), true);
                                             $result->AutenticarUsuarioContenidoResult->Codigo = '-6';
                                             $result->AutenticarUsuarioContenidoResult->Descripcion = "L'identificador de la activitat no &eacute;s v&agrave;lid ";
-                                            $result->AutenticarUsuarioContenidoResult->URL = "http://www.xtec.cat/error.html";
+                                            $result->AutenticarUsuarioContenidoResult->URL = "https://mps.xtec.cat/error.html";
                                             return $result;
                                         } else {
                                             if ($bookpath->format == 'scorm') {
@@ -282,17 +282,17 @@ function AutenticarUsuarioContenido($usrcontent)
             } else {
                 $result->AutenticarUsuarioContenidoResult->Codigo = '-2';
                 $result->AutenticarUsuarioContenidoResult->Descripcion = 'El codi de llicencia no és vàlid.';
-                $result->AutenticarUsuarioContenidoResult->URL = 'http://www.xtec.cat/error.html';
+                $result->AutenticarUsuarioContenidoResult->URL = 'https://mps.xtec.cat/error.html';
             }
         } else {
             $result->AutenticarUsuarioContenidoResult->Codigo = '-3';
             $result->AutenticarUsuarioContenidoResult->Descripcion = 'El codi ISBN del producte no és vàlid.';
-            $result->AutenticarUsuarioContenidoResult->URL = 'http://www.xtec.cat/error.html';
+            $result->AutenticarUsuarioContenidoResult->URL = 'https://mps.xtec.cat/error.html';
         }
     } else {
         $result->AutenticarUsuarioContenidoResult->Codigo = $auth->Codigo;
         $result->AutenticarUsuarioContenidoResult->Descripcion = $auth->Descripcion;
-        $result->AutenticarUsuarioContenidoResult->URL = $auth->url ?? 'http://www.xtec.cat/error.html';
+        $result->AutenticarUsuarioContenidoResult->URL = $auth->url ?? 'https://mps.xtec.cat/error.html';
     }
 
     add_to_log(1, 20, serialize($result->AutenticarUsuarioContenidoResult));
@@ -306,7 +306,7 @@ function UserAuthentication($post_data): stdClass
     $retAut = new stdClass();
     $retAut->Codigo = '-101';
     $retAut->Descripcion = 'Usuari/contrasenya errònies';
-    $retAut->url = 'http://www.xtec.cat/error.html';
+    $retAut->url = 'https://mps.xtec.cat/error.html';
 
     $post = rcommon_xml2array($post_data);
 
